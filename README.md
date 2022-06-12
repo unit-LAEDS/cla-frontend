@@ -24,7 +24,7 @@ A página web ficará disponível no endereço <code>http://localhost:3000</code
 
 ## Faça sua contribuição
 
-Após finalizar sua alterações e adicioná-las ao _stage_ do git, rode o seguinte comando:
+Após finalizar suas alterações e adicioná-las ao _stage_ do git, rode o seguinte comando:
 
 ```bash
 npm run commit
