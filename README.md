@@ -5,7 +5,7 @@
 ### Faça o clone do projeto
 
 ```bash
-
+git clone https://github.com/unit-LAEDS/cla-frontend.git
 ```
 
 ### Instale as dependências
