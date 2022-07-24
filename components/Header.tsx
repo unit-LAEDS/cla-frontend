@@ -98,14 +98,6 @@ export const DefaultHeader = () => {
               }
               onClick={() => toggleColorScheme()}
             >
-              {/* <UnstyledButton
-                  sx={theme => ({
-                    color:
-                      theme.colorScheme === "dark"
-                        ? theme.colors.yellow[4]
-                        : theme.colors.blue[6],
-                  })}
-                ></UnstyledButton> */}
               {dark ? "Claro" : "Escuro"}
             </Menu.Item>
 
