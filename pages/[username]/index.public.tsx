@@ -20,6 +20,10 @@ import Link from "next/link";
 import { xaropinho } from "public";
 import { useEffect, useState } from "react";
 import { fetchGitHubInfo } from "services";
+import RichTextEditor from "components/RichText";
+
+const initialValue =
+  "<p>Insira seu <b>username</b> do GitHub na url <br> Ex: laeds.org/NahtanN </p>";
 
 export const getStaticProps: GetStaticProps = context => {
   const param = context.params;
@@ -65,6 +69,8 @@ const UsernameProfile: NextPage = ({
         bio: data.bio,
       });
     } catch (err) {
+      setLoading(false);
+
       setGithubInfo({
         avatarUrl: xaropinho.src,
         html_url: "",
@@ -88,14 +94,8 @@ const UsernameProfile: NextPage = ({
           <Paper
             radius="md"
             withBorder
+            className={classes.basicInfoPaper}
             p="lg"
-            sx={theme => ({
-              width: "30rem",
-              backgroundColor:
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[8]
-                  : theme.white,
-            })}
           >
             <Avatar
               src={githubInfo.avatarUrl}
@@ -140,7 +140,19 @@ const UsernameProfile: NextPage = ({
             )}
           </Card>
         </section>
-        <section className={classes.userDetails}></section>
+        <section className={classes.userDetails}>
+          <RichTextEditor
+            p={0}
+            style={{
+              width: "100%",
+              padding: 0,
+              margin: 0,
+            }}
+            readOnly
+            value={initialValue}
+            onChange={() => {}}
+          />
+        </section>
       </Container>
     </BasicLayout>
   );
@@ -150,16 +162,40 @@ const useClasses = createStyles(theme => ({
   container: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "10rem",
+    justifyContent: "space-evenly",
+
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      gap: "2rem",
+    },
   },
 
   basicInfo: {
     display: "flex",
     flexDirection: "column",
     gap: "2rem",
+
+    [`@media (max-width: ${theme.breakpoints.xs}px)`]: {
+      width: "100%",
+    },
   },
 
-  userDetails: {},
+  basicInfoPaper: {
+    width: "30rem",
+    backgroundColor:
+      theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
+
+    [`@media (max-width: ${theme.breakpoints.xs}px)`]: {
+      width: "100%",
+    },
+  },
+
+  userDetails: {
+    width: "50%",
+
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      width: "100%",
+    },
+  },
 
   socialMedia: {
     marginTop: "1rem",
