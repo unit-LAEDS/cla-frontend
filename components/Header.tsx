@@ -13,6 +13,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
+import { ContainerEnum } from "global";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -58,7 +59,7 @@ export const DefaultHeader = () => {
 
   return (
     <Header height={HEADER_HEIGHT}>
-      <Container className={classes.inner} size={1500}>
+      <Container className={classes.inner} size={ContainerEnum.size}>
         <h1>LAEDS</h1>
 
         <Group spacing={50}>
