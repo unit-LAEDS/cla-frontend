@@ -17,7 +17,7 @@ import { ContainerEnum } from "global";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Logout, MoonStars, Sun, User } from "tabler-icons-react";
+import { Logout, MoonStars, Settings, Sun, User } from "tabler-icons-react";
 
 type LinkType = {
   label: string;
@@ -58,9 +58,13 @@ export const DefaultHeader = () => {
   ));
 
   return (
-    <Header height={HEADER_HEIGHT}>
+    <Header height={HEADER_HEIGHT} mb={30}>
       <Container className={classes.inner} size={ContainerEnum.size}>
-        <h1>LAEDS</h1>
+        <Link href={"/"}>
+          <a>
+            <h1>LAEDS</h1>
+          </a>
+        </Link>
 
         <Group spacing={50}>
           <Group spacing={5}>{links}</Group>
@@ -69,7 +73,7 @@ export const DefaultHeader = () => {
             closeOnItemClick={false}
             control={
               <UnstyledButton>
-                <Avatar color={"red"} />
+                <Avatar color={"grape"} />
               </UnstyledButton>
             }
           >
@@ -106,9 +110,17 @@ export const DefaultHeader = () => {
             <Menu.Item
               icon={<User size={14} />}
               component={NextLink}
-              href={"/operadores/perfil"}
+              href={"/uuuueeeeppa"}
             >
               Meu Perfil
+            </Menu.Item>
+
+            <Menu.Item
+              icon={<Settings size={14} />}
+              component={NextLink}
+              href={"/settings/profile"}
+            >
+              Configurações
             </Menu.Item>
 
             <Menu.Item
@@ -141,7 +153,7 @@ const useClasses = createStyles(theme => ({
   linkActive: {
     textAlign: "center",
     color: "var(--light-blue)",
-    backgroundColor: "#0eb1d218",
+    backgroundColor: "var(--dimmed-blue)",
     borderRadius: "0.5rem",
   },
 

@@ -129,13 +129,11 @@ const UsernameProfile: NextPage = ({
             {githubInfo.html_url && (
               <div className={classes.socialMedia}>
                 <Text size="sm">GitHub</Text>
-                <Link href={`${githubInfo.html_url}`}>
-                  <a target={"_blank"}>
-                    <Text size="xs" color="dimmed">
-                      {`${githubInfo.html_url}`}
-                    </Text>
-                  </a>
-                </Link>
+                <a href={`${githubInfo.html_url}`} target={"_blank"}>
+                  <Text size="xs" color="dimmed">
+                    {`${githubInfo.html_url}`}
+                  </Text>
+                </a>
               </div>
             )}
           </Card>
