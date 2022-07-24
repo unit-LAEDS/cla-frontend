@@ -1,29 +1,30 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
 import {
   ColorScheme,
   ColorSchemeProvider,
   MantineProvider,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
-import { useLocalStorage } from "@mantine/hooks";
+import { NotificationsProvider } from "@mantine/notifications";
+import { getCookie, setCookies } from "cookies-next";
+import { GetServerSidePropsContext } from "next";
+import { AppProps } from "next/app";
+import { useState } from "react";
+import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const [defaultTheme, setDefaultTheme] = useLocalStorage<ColorScheme>({
-    key: "colorTheme",
-    defaultValue: "light",
-  });
-  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+  const { Component, pageProps } = props;
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(
+    props.colorScheme
+  );
+
   const toggleColorScheme = (value?: ColorScheme) => {
-    let theme = value || (colorScheme === "dark" ? "light" : "dark");
+    const nextColorScheme =
+      value || (colorScheme === "dark" ? "light" : "dark");
 
-    setColorScheme(theme);
-    setDefaultTheme(theme);
+    setColorScheme(nextColorScheme);
+    setCookies("mantine-color-scheme", nextColorScheme, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
   };
-
-  useEffect(() => {
-    setColorScheme(defaultTheme);
-  }, []);
 
   return (
     <ColorSchemeProvider
@@ -32,13 +33,17 @@ function MyApp({ Component, pageProps }: AppProps) {
     >
       <MantineProvider
         theme={{ colorScheme }}
-        withNormalizeCSS
         withGlobalStyles
+        withNormalizeCSS
       >
-        <Component {...pageProps} />
+        <NotificationsProvider>
+          <Component {...pageProps} />
+        </NotificationsProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   );
 }
 
-export default MyApp;
+App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
+  colorScheme: getCookie("mantine-color-scheme", ctx) || "light",
+});
