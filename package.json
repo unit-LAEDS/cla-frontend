@@ -16,6 +16,8 @@
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.4.7",
     "@mantine/core": "^4.2.8",
+    "@mantine/dropzone": "^4.2.12",
+    "@mantine/form": "^4.2.12",
     "@mantine/hooks": "^4.2.8",
     "@mantine/next": "^4.2.8",
     "@mantine/notifications": "^4.2.12",

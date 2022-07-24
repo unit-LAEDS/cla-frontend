@@ -153,7 +153,7 @@ const useClasses = createStyles(theme => ({
   linkActive: {
     textAlign: "center",
     color: "var(--light-blue)",
-    backgroundColor: "#0eb1d218",
+    backgroundColor: "var(--dimmed-blue)",
     borderRadius: "0.5rem",
   },
 
