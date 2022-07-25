@@ -1,6 +1,6 @@
 import {
-  ActionIcon,
   Avatar,
+  Button,
   Container,
   createStyles,
   Divider,
@@ -13,6 +13,14 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
+import {
+  IconArrowsLeftRight,
+  IconMessageCircle,
+  IconPhoto,
+  IconSearch,
+  IconSettings,
+  IconTrash,
+} from "@tabler/icons";
 import { ContainerEnum } from "global";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -68,68 +76,68 @@ export const DefaultHeader = () => {
 
         <Group spacing={50}>
           <Group spacing={5}>{links}</Group>
-          <Menu
-            withArrow
-            closeOnItemClick={false}
-            control={
+          <Menu>
+            <Menu.Target>
               <UnstyledButton>
                 <Avatar color={"grape"} />
               </UnstyledButton>
-            }
-          >
-            <Menu.Label pb={0}>Logado como</Menu.Label>
-            <Menu.Item disabled py={0}>
-              <Text
-                size={"xs"}
-                color={
-                  colorScheme === "dark"
-                    ? mantineTheme.white
-                    : mantineTheme.black
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Label pb={0}>Logado como</Menu.Label>
+              <Menu.Item disabled py={0}>
+                <Text
+                  size={"xs"}
+                  color={
+                    colorScheme === "dark"
+                      ? mantineTheme.white
+                      : mantineTheme.black
+                  }
+                >
+                  Nathan
+                </Text>
+              </Menu.Item>
+
+              <Menu.Label>Tema</Menu.Label>
+              <Menu.Item
+                icon={
+                  dark ? (
+                    <Sun size={18} color={mantineTheme.colors.yellow[4]} />
+                  ) : (
+                    <MoonStars size={18} color={mantineTheme.colors.blue[6]} />
+                  )
                 }
+                onClick={() => toggleColorScheme()}
               >
-                Nathan
-              </Text>
-            </Menu.Item>
+                {dark ? "Claro" : "Escuro"}
+              </Menu.Item>
 
-            <Menu.Label>Tema</Menu.Label>
-            <Menu.Item
-              icon={
-                dark ? (
-                  <Sun size={18} color={mantineTheme.colors.yellow[4]} />
-                ) : (
-                  <MoonStars size={18} color={mantineTheme.colors.blue[6]} />
-                )
-              }
-              onClick={() => toggleColorScheme()}
-            >
-              {dark ? "Claro" : "Escuro"}
-            </Menu.Item>
+              <Divider />
 
-            <Divider />
+              <Menu.Item
+                icon={<User size={14} />}
+                component={NextLink}
+                href={"/uuuueeeeppa"}
+              >
+                Meu Perfil
+              </Menu.Item>
 
-            <Menu.Item
-              icon={<User size={14} />}
-              component={NextLink}
-              href={"/uuuueeeeppa"}
-            >
-              Meu Perfil
-            </Menu.Item>
+              <Menu.Item
+                icon={<Settings size={14} />}
+                component={NextLink}
+                href={"/settings/profile"}
+              >
+                Configurações
+              </Menu.Item>
 
-            <Menu.Item
-              icon={<Settings size={14} />}
-              component={NextLink}
-              href={"/settings/profile"}
-            >
-              Configurações
-            </Menu.Item>
-
-            <Menu.Item
-              color="red"
-              icon={<Logout size={14} />}
-              // onClick={logOut}
-            >
-              Sair
-            </Menu.Item>
+              <Menu.Item
+                color="red"
+                icon={<Logout size={14} />}
+                // onClick={logOut}
+              >
+                Sair
+              </Menu.Item>
+            </Menu.Dropdown>
           </Menu>
         </Group>
       </Container>
