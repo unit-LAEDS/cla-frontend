@@ -9,7 +9,6 @@ import { GetServerSidePropsContext } from "next";
 import { AppProps } from "next/app";
 import { useState } from "react";
 import "../styles/globals.css";
-import { rtlCache } from "../rtl-cache";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -33,10 +32,9 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       toggleColorScheme={toggleColorScheme}
     >
       <MantineProvider
-        theme={{ colorScheme, dir: "rtl" }}
+        theme={{ colorScheme }}
         withGlobalStyles
         withNormalizeCSS
-        emotionCache={rtlCache}
       >
         <NotificationsProvider>
           <Component {...pageProps} />

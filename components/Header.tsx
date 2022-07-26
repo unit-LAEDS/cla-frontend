@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Button,
   Container,
   createStyles,
   Divider,
@@ -13,14 +12,6 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
-import {
-  IconArrowsLeftRight,
-  IconMessageCircle,
-  IconPhoto,
-  IconSearch,
-  IconSettings,
-  IconTrash,
-} from "@tabler/icons";
 import { ContainerEnum } from "global";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -76,7 +67,12 @@ export const DefaultHeader = () => {
 
         <Group spacing={50}>
           <Group spacing={5}>{links}</Group>
-          <Menu>
+          <Menu
+            closeOnItemClick={false}
+            withArrow
+            position={"bottom-end"}
+            width={200}
+          >
             <Menu.Target>
               <UnstyledButton>
                 <Avatar color={"grape"} />
@@ -84,7 +80,7 @@ export const DefaultHeader = () => {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Menu.Label pb={0}>Logado como</Menu.Label>
+              <Menu.Label>Logado como</Menu.Label>
               <Menu.Item disabled py={0}>
                 <Text
                   size={"xs"}

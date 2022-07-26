@@ -1,4 +1,4 @@
-import { useForm, formList } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import {
   TextInput,
   Switch,
@@ -15,7 +15,7 @@ import { Trash } from "tabler-icons-react";
 const SocialMediaFormList = () => {
   const form = useForm({
     initialValues: {
-      socialLinks: formList([{ name: "", value: "", key: randomId() }]),
+      socialLinks: [{ name: "", value: "", key: randomId() }],
     },
   });
 
@@ -33,19 +33,18 @@ const SocialMediaFormList = () => {
         placeholder="Linkedin"
         required
         sx={{ flex: 1 }}
-        {...form.getListInputProps("socialLinks", index, "name")}
+        {...form.getInputProps(`socialLinks.${index}.name`)}
       />
       <TextInput
         label="link"
         placeholder="URL"
         required
         sx={{ flex: 1 }}
-        {...form.getListInputProps("socialLinks", index, "value")}
+        {...form.getInputProps(`socialLinks.${index}.value`)}
       />
 
       <ActionIcon
         color="red"
-        variant="hover"
         style={{
           alignSelf: "flex-end",
           bottom: "5px",
@@ -76,7 +75,7 @@ const SocialMediaFormList = () => {
       <Group position="center" mt="md">
         <Button
           onClick={() =>
-            form.addListItem("socialLinks", {
+            form.insertListItem("socialLinks", {
               name: "",
               value: "",
               key: randomId(),
