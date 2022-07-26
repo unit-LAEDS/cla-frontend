@@ -16,7 +16,7 @@ const BasicLayout = ({
   ...props
 }: BasicLayoutInterface) => {
   return (
-    <AppShell header={<DefaultHeader />}>
+    <AppShell fixed={false} header={<DefaultHeader />}>
       <Head>
         <title>{props.title}</title>
         <meta name="description" content={props.description} />

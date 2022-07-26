@@ -8,6 +8,7 @@ import {
   Skeleton,
   Text,
 } from "@mantine/core";
+import RichTextEditor from "components/RichText";
 import { ContainerEnum } from "global";
 import { BasicLayout } from "layouts";
 import {
@@ -16,11 +17,9 @@ import {
   InferGetStaticPropsType,
   NextPage,
 } from "next";
-import Link from "next/link";
 import { xaropinho } from "public";
 import { useEffect, useState } from "react";
 import { fetchGitHubInfo } from "services";
-import RichTextEditor from "components/RichText";
 
 const initialValue =
   "<p>Insira seu <b>username</b> do GitHub na url <br> Ex: laeds.org/NahtanN </p>";
