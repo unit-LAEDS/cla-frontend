@@ -11,8 +11,15 @@ import {
 } from "@mantine/core";
 import { randomId } from "@mantine/hooks";
 import { Trash } from "tabler-icons-react";
+import { useEffect } from "react";
 
-const SocialMediaFormList = () => {
+interface SocialMediaFormListInterface {
+  socialMediaLinks: (links: number) => void;
+}
+
+const SocialMediaFormList = ({
+  socialMediaLinks,
+}: SocialMediaFormListInterface) => {
   const form = useForm({
     initialValues: {
       socialLinks: [{ name: "", value: "", key: randomId() }],
@@ -56,6 +63,10 @@ const SocialMediaFormList = () => {
     </Group>
   ));
 
+  useEffect(() => {
+    socialMediaLinks(fields.length);
+  }, [fields]);
+
   return (
     <Box sx={{ maxWidth: 500 }} mx="auto">
       {fields.length > 0 ? (
@@ -74,6 +85,9 @@ const SocialMediaFormList = () => {
 
       <Group position="center" mt="md">
         <Button
+          style={{
+            display: fields.length === 5 ? "none" : "block",
+          }}
           onClick={() =>
             form.insertListItem("socialLinks", {
               name: "",
