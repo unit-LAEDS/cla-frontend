@@ -1,61 +1,18 @@
 import {
-  Avatar,
   Container,
   createStyles,
-  Group,
-  MantineTheme,
   Paper,
+  Stack,
   Text,
   Textarea,
   TextInput,
   useMantineTheme,
 } from "@mantine/core";
-import { Dropzone, DropzoneStatus, IMAGE_MIME_TYPE } from "@mantine/dropzone";
-import { ContainerEnum } from "global";
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import { BasicLayout } from "layouts";
-import { Upload, Photo, X, Icon as TablerIcon } from "tabler-icons-react";
+import { Upload } from "tabler-icons-react";
 import { SocialMediaFormList } from "./components/SocialMediaFormList";
-
-function getIconColor(status: DropzoneStatus, theme: MantineTheme) {
-  return status.accepted
-    ? theme.colors[theme.primaryColor][theme.colorScheme === "dark" ? 4 : 6]
-    : status.rejected
-    ? theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]
-    : theme.colorScheme === "dark"
-    ? theme.colors.dark[0]
-    : theme.colors.gray[7];
-}
-
-function ImageUploadIcon({
-  status,
-  ...props
-}: React.ComponentProps<TablerIcon> & { status: DropzoneStatus }) {
-  if (status.accepted) {
-    return <Upload {...props} />;
-  }
-
-  if (status.rejected) {
-    return <X {...props} />;
-  }
-
-  return <Photo {...props} />;
-}
-
-export const dropzoneChildren = (
-  status: DropzoneStatus,
-  theme: MantineTheme
-) => (
-  <>
-    <Group align={"center"} direction={"column"}>
-      <ImageUploadIcon
-        status={status}
-        style={{ color: getIconColor(status, theme) }}
-        size={80}
-      />
-      <Text>Foto de Perfil</Text>
-    </Group>
-  </>
-);
 
 const Profile = () => {
   const theme = useMantineTheme();
@@ -80,7 +37,34 @@ const Profile = () => {
               maxSize={3 * 1024 ** 2}
               accept={IMAGE_MIME_TYPE}
             >
-              {status => dropzoneChildren(status, theme)}
+              <Stack align={"center"}>
+                <Dropzone.Accept>
+                  <IconUpload
+                    size={50}
+                    stroke={1.5}
+                    color={
+                      theme.colors[theme.primaryColor][
+                        theme.colorScheme === "dark" ? 4 : 6
+                      ]
+                    }
+                  />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX
+                    size={50}
+                    stroke={1.5}
+                    color={
+                      theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]
+                    }
+                  />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <Stack align={"center"}>
+                    <IconPhoto size={50} stroke={1.5} />
+                    <Text>Foto de Perfil</Text>
+                  </Stack>
+                </Dropzone.Idle>
+              </Stack>
             </Dropzone>
             <div className={classes.presentationCardInputs}>
               <TextInput label="Nome" required />
@@ -140,7 +124,7 @@ const useClasses = createStyles((theme, _params, getRef) => ({
 
   presentationCardDropzone: {
     ref: getRef("presentationCardDropzone"),
-    width: "30%",
+    width: "20rem",
   },
 
   presentationCardInputs: {

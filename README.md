@@ -1,5 +1,9 @@
 <h1 align="center">🚧 Em construção 🚧</h1>
 
+## Requisitos
+
+- NodeJs versão 16x
+
 ## Instalar e rodar o projeto
 
 ### Faça o clone do projeto
