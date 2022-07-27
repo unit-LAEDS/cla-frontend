@@ -18,6 +18,8 @@ import { BasicLayout } from "layouts";
 import React, { useState } from "react";
 import { SocialMediaFormList } from "./components/SocialMediaFormList";
 
+const initialValue = "<p>Escreva como se a sua vida dependesse disso 👍</p>";
+
 const Profile = () => {
   const { classes } = useClasses();
   const matches = useMediaQuery("(min-width: 425px)");
@@ -42,15 +44,15 @@ const ProfileContent = () => {
   const theme = useMantineTheme();
   const { classes } = useClasses();
 
-  const [rteValue, setRteValue] = useState("");
+  const [rteValue, setRteValue] = useState(initialValue);
   const [linksLength, setLinksLength] = useState(0);
 
   const handleSubmitForm = (event: React.FormEvent) => {
     event.preventDefault();
 
-    let emptyRte = "<p><br></p>";
+    let emptyRte = rteValue === "<p><br></p>" || rteValue === initialValue;
 
-    if (rteValue != emptyRte && linksLength > 0) {
+    if (!emptyRte && linksLength > 0) {
       return;
     }
 
@@ -63,7 +65,7 @@ const ProfileContent = () => {
       });
     }
 
-    if (rteValue === emptyRte) {
+    if (emptyRte) {
       showNotification({
         autoClose: 10000,
         title: "Escreva um pouco mais sobre você",
