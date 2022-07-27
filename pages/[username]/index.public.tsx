@@ -17,6 +17,8 @@ import {
   InferGetStaticPropsType,
   NextPage,
 } from "next";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { xaropinho } from "public";
 import { useEffect, useState } from "react";
 import { fetchGitHubInfo } from "services";
@@ -45,15 +47,20 @@ export const getStaticPaths: GetStaticPaths = () => {
 const UsernameProfile: NextPage = ({
   username,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { data: session } = useSession();
+  const { asPath } = useRouter();
   const { classes } = useClasses();
 
   const [loading, setLoading] = useState(false);
-  const [githubInfo, setGithubInfo] = useState({
-    avatarUrl: "",
-    name: "",
-    html_url: "",
-    bio: "",
-  });
+  const [user, setUser] = useState<{
+    image?: string | null | undefined;
+    name?: string | null | undefined;
+    bio?: string | null | undefined;
+    socialMedia: {
+      name?: string | null | undefined;
+      link?: string | null | undefined;
+    }[];
+  }>();
 
   const handleGitHubFetch = async () => {
     try {
@@ -61,27 +68,51 @@ const UsernameProfile: NextPage = ({
       const data = await fetchGitHubInfo(username);
       setLoading(false);
 
-      setGithubInfo({
-        avatarUrl: data.avatar_url,
-        html_url: data.html_url,
+      setUser({
+        image: data.avatar_url,
         name: data.name,
         bio: data.bio,
+        socialMedia: [
+          {
+            link: data.html_url,
+            name: "GitHub",
+          },
+        ],
       });
     } catch (err) {
       setLoading(false);
 
-      setGithubInfo({
-        avatarUrl: xaropinho.src,
-        html_url: "",
+      setUser({
+        image: xaropinho.src,
         name: "Xaropinho",
         bio: "Comfortably Numb - Live (Pulse Show)",
+        socialMedia: [],
       });
     }
   };
 
   useEffect(() => {
-    handleGitHubFetch();
-  }, []);
+    if (session) {
+      let user = session.user;
+      let urlPath = user?.name?.split(" ").join("");
+
+      asPath.replace("/", "") === urlPath
+        ? setUser({
+            image: user?.image,
+            name: user?.name,
+            bio: "",
+            socialMedia: [
+              {
+                link: user?.email,
+                name: "E-mail",
+              },
+            ],
+          })
+        : handleGitHubFetch();
+    }
+
+    if (session === null) handleGitHubFetch();
+  }, [session, asPath]);
 
   return (
     <BasicLayout
@@ -96,14 +127,9 @@ const UsernameProfile: NextPage = ({
             className={classes.basicInfoPaper}
             p="lg"
           >
-            <Avatar
-              src={githubInfo.avatarUrl}
-              size={120}
-              radius={120}
-              mx="auto"
-            />
+            <Avatar src={user?.image} size={120} radius={120} mx="auto" />
             <Text align="center" size="lg" weight={500} mt="md">
-              {loading ? <Skeleton height={8} radius="lg" /> : githubInfo.name}
+              {loading ? <Skeleton height={8} radius="lg" /> : user?.name}
             </Text>
             <Text
               align="center"
@@ -113,7 +139,7 @@ const UsernameProfile: NextPage = ({
                 wordBreak: "break-word",
               }}
             >
-              {githubInfo.bio}
+              {user?.bio}
             </Text>
           </Paper>
 
@@ -125,16 +151,16 @@ const UsernameProfile: NextPage = ({
                 <Skeleton height={8} mt={10} radius="lg" />
               </>
             )}
-            {githubInfo.html_url && (
+            {user?.socialMedia.map(media => (
               <div className={classes.socialMedia}>
-                <Text size="sm">GitHub</Text>
-                <a href={`${githubInfo.html_url}`} target={"_blank"}>
+                <Text size="sm">{media.name}</Text>
+                <a href={`${media.link}`} target={"_blank"}>
                   <Text size="xs" color="dimmed">
-                    {`${githubInfo.html_url}`}
+                    {`${media.link}`}
                   </Text>
                 </a>
               </div>
-            )}
+            ))}
           </Card>
         </section>
         <section className={classes.userDetails}>

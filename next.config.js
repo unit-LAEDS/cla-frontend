@@ -4,6 +4,9 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     SECRET: process.env.SECRET,
+    GITHUB_ID: process.env.GITHUB_ID,
+    GITHUB_SECRET: process.env.GITHUB_SECRET,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
 };
 

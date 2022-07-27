@@ -13,9 +13,10 @@ import {
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { ContainerEnum } from "global";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logout, MoonStars, Settings, Sun, User } from "tabler-icons-react";
 
 type LinkType = {
@@ -33,12 +34,15 @@ const items: LinkType[] = [
 const HEADER_HEIGHT = 60;
 
 export const DefaultHeader = () => {
+  const { data: session } = useSession();
   const { classes } = useClasses();
   const mantineTheme = useMantineTheme();
 
   const { pathname } = useRouter();
   const [active, setActive] = useState(pathname);
+  const [profileLink, setProfileLink] = useState("");
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
   const dark = colorScheme === "dark";
 
   const setSelected = (href: string) => setActive(href);
@@ -56,6 +60,16 @@ export const DefaultHeader = () => {
     </Link>
   ));
 
+  useEffect(() => {
+    if (session) {
+      let linkHref = session.user?.name?.split(" ").join("");
+
+      return setProfileLink(linkHref!);
+    }
+
+    setProfileLink("/uuuueeeeppa");
+  }, [session]);
+
   return (
     <Header height={HEADER_HEIGHT} mb={30}>
       <Container className={classes.inner} size={ContainerEnum.size}>
@@ -66,75 +80,96 @@ export const DefaultHeader = () => {
         </Link>
 
         <Group spacing={50}>
-          <Group spacing={5}>{links}</Group>
-          <Menu
-            closeOnItemClick={false}
-            withArrow
-            position={"bottom-end"}
-            width={200}
-          >
-            <Menu.Target>
-              <UnstyledButton>
-                <Avatar color={"grape"} />
-              </UnstyledButton>
-            </Menu.Target>
-
-            <Menu.Dropdown>
-              <Menu.Label>Logado como</Menu.Label>
-              <Menu.Item disabled py={0}>
-                <Text
-                  size={"xs"}
-                  color={
-                    colorScheme === "dark"
-                      ? mantineTheme.white
-                      : mantineTheme.black
-                  }
+          <Group spacing={5}>
+            {links}
+            {!session && (
+              <Link href={"/auth/signin"} key={"Signin"}>
+                <a
+                  className={`${
+                    active === "/auth/signin"
+                      ? classes.linkActive
+                      : classes.linkDisable
+                  } ${classes.link}`}
+                  onClick={() => setSelected("/auth/signin")}
                 >
-                  Nathan
-                </Text>
-              </Menu.Item>
+                  Signin
+                </a>
+              </Link>
+            )}
+          </Group>
+          {session && (
+            <Menu
+              closeOnItemClick={false}
+              withArrow
+              position={"bottom-end"}
+              width={200}
+            >
+              <Menu.Target>
+                <UnstyledButton>
+                  <Avatar color={"grape"} />
+                </UnstyledButton>
+              </Menu.Target>
 
-              <Menu.Label>Tema</Menu.Label>
-              <Menu.Item
-                icon={
-                  dark ? (
-                    <Sun size={18} color={mantineTheme.colors.yellow[4]} />
-                  ) : (
-                    <MoonStars size={18} color={mantineTheme.colors.blue[6]} />
-                  )
-                }
-                onClick={() => toggleColorScheme()}
-              >
-                {dark ? "Claro" : "Escuro"}
-              </Menu.Item>
+              <Menu.Dropdown>
+                <Menu.Label>Logado como</Menu.Label>
+                <Menu.Item disabled py={0}>
+                  <Text
+                    size={"xs"}
+                    color={
+                      colorScheme === "dark"
+                        ? mantineTheme.white
+                        : mantineTheme.black
+                    }
+                  >
+                    {session.user?.email}
+                  </Text>
+                </Menu.Item>
 
-              <Divider />
+                <Menu.Label>Tema</Menu.Label>
+                <Menu.Item
+                  icon={
+                    dark ? (
+                      <Sun size={18} color={mantineTheme.colors.yellow[4]} />
+                    ) : (
+                      <MoonStars
+                        size={18}
+                        color={mantineTheme.colors.blue[6]}
+                      />
+                    )
+                  }
+                  onClick={() => toggleColorScheme()}
+                >
+                  {dark ? "Claro" : "Escuro"}
+                </Menu.Item>
 
-              <Menu.Item
-                icon={<User size={14} />}
-                component={NextLink}
-                href={"/uuuueeeeppa"}
-              >
-                Meu Perfil
-              </Menu.Item>
+                <Divider />
 
-              <Menu.Item
-                icon={<Settings size={14} />}
-                component={NextLink}
-                href={"/settings/profile"}
-              >
-                Configurações
-              </Menu.Item>
+                <Menu.Item
+                  icon={<User size={14} />}
+                  component={NextLink}
+                  href={`/${profileLink}`}
+                >
+                  Meu Perfil
+                </Menu.Item>
 
-              <Menu.Item
-                color="red"
-                icon={<Logout size={14} />}
-                // onClick={logOut}
-              >
-                Sair
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+                <Menu.Item
+                  icon={<Settings size={14} />}
+                  component={NextLink}
+                  href={"/settings/profile"}
+                >
+                  Configurações
+                </Menu.Item>
+
+                <Menu.Item
+                  color="red"
+                  icon={<Logout size={14} />}
+                  onClick={() => signOut()}
+                >
+                  Sair
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          )}
         </Group>
       </Container>
     </Header>
