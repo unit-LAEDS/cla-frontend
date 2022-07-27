@@ -7,7 +7,8 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { getCookie, setCookies } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import { AppProps } from "next/app";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
@@ -26,24 +27,28 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
     });
   };
 
+  useEffect(() => {
+    let mantineColorScheme = getCookie("mantine-color-scheme") || "light";
+
+    setColorScheme(mantineColorScheme as ColorScheme);
+  }, []);
+
   return (
-    <ColorSchemeProvider
-      colorScheme={colorScheme}
-      toggleColorScheme={toggleColorScheme}
-    >
-      <MantineProvider
-        theme={{ colorScheme }}
-        withGlobalStyles
-        withNormalizeCSS
+    <SessionProvider session={pageProps.session}>
+      <ColorSchemeProvider
+        colorScheme={colorScheme}
+        toggleColorScheme={toggleColorScheme}
       >
-        <NotificationsProvider>
-          <Component {...pageProps} />
-        </NotificationsProvider>
-      </MantineProvider>
-    </ColorSchemeProvider>
+        <MantineProvider
+          theme={{ colorScheme }}
+          withGlobalStyles
+          withNormalizeCSS
+        >
+          <NotificationsProvider>
+            <Component {...pageProps} />
+          </NotificationsProvider>
+        </MantineProvider>
+      </ColorSchemeProvider>
+    </SessionProvider>
   );
 }
-
-App.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
-  colorScheme: getCookie("mantine-color-scheme", ctx) || "light",
-});

@@ -1,8 +1,20 @@
 import { NextMiddleware, NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export const middleware: NextMiddleware = async (request: NextRequest) => {
-  if (request.nextUrl.pathname.startsWith("/settings")) {
-    return NextResponse.rewrite(new URL("/settings/profile", request.url));
+const secret = process.env.SECRET;
+
+export const middleware: NextMiddleware = async (req: NextRequest) => {
+  const token = await getToken({
+    req,
+    secret,
+  });
+
+  if (req.nextUrl.pathname.startsWith("/settings")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/auth/signin", req.url));
+    }
+
+    return NextResponse.rewrite(new URL("/settings/profile", req.url));
   }
 };
