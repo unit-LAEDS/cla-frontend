@@ -147,7 +147,7 @@ export const DefaultHeader = () => {
                 <Menu.Item
                   icon={<User size={14} />}
                   component={NextLink}
-                  href={`/${profileLink}`}
+                  href={`/user/${profileLink}`}
                 >
                   Meu Perfil
                 </Menu.Item>

@@ -11,14 +11,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-} from "next";
-import { unstable_getServerSession } from "next-auth";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getToken } from "next-auth/jwt";
-import { getCsrfToken, getProviders, signIn } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
+import Link from "next/link";
 import { BrandGithub } from "tabler-icons-react";
 
 const secret = process.env.SECRET;
@@ -122,13 +118,9 @@ export default function Signin({
 
         <Text color="dimmed" size="sm" align="center" mt={5}>
           Ainda não tem uma conta?{" "}
-          <Anchor<"a">
-            href="#"
-            size="sm"
-            onClick={event => event.preventDefault()}
-          >
-            Criar Conta
-          </Anchor>
+          <Link href="/auth/signup">
+            <Anchor<"a"> size="sm">Criar Conta</Anchor>
+          </Link>
         </Text>
       </Container>
     </div>

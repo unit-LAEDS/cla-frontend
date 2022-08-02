@@ -96,7 +96,7 @@ const UsernameProfile: NextPage = ({
       let user = session.user;
       let urlPath = user?.name?.split(" ").join("");
 
-      asPath.replace("/", "") === urlPath
+      asPath.replace("/", "") === `user/${urlPath}`
         ? setUser({
             image: user?.image,
             name: user?.name,
