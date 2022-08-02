@@ -7,6 +7,7 @@ import {
   Header,
   Menu,
   Text,
+  Title,
   UnstyledButton,
   useMantineColorScheme,
   useMantineTheme,
@@ -75,7 +76,7 @@ export const DefaultHeader = () => {
       <Container className={classes.inner} size={ContainerEnum.size}>
         <Link href={"/"}>
           <a>
-            <h1>LAEDS</h1>
+            <Title order={1}>LAEDS</Title>
           </a>
         </Link>
 

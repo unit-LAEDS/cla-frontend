@@ -17,4 +17,6 @@ export const middleware: NextMiddleware = async (req: NextRequest) => {
 
     return NextResponse.rewrite(new URL("/settings/profile", req.url));
   }
+
+  return NextResponse.next();
 };

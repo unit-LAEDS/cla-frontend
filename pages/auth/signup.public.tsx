@@ -16,12 +16,14 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useInputState } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
 import { IconAt, IconCheck, IconX } from "@tabler/icons";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getToken } from "next-auth/jwt";
 import { getCsrfToken } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+import { laedsSignup } from "services";
 
 const secret = process.env.SECRET;
 
@@ -89,6 +91,21 @@ export default function Signup({
       setTimeout(() => setShake(false), 300);
 
       return;
+    }
+
+    try {
+      await laedsSignup({
+        username: form.values.username,
+        email: form.values.email,
+        password: value,
+      });
+    } catch (err) {
+      showNotification({
+        title: "Ops... tivemos algum problema",
+        message:
+          "Parece que o nosso servidor esta fora do ar, tente novamente em alguns instantes.",
+        color: "red",
+      });
     }
   };
 
@@ -173,6 +190,7 @@ export default function Signup({
               />
               <TextInput
                 label="Email"
+                type={"email"}
                 placeholder="seumelhor@email.com"
                 required
                 {...form.getInputProps("email")}
@@ -207,11 +225,11 @@ export default function Signup({
 
             <Text color="dimmed" size="xs" align="center" mt={10}>
               Ao criar um conta você concorda com os{" "}
-              <Link href="/auth/signin">
+              <Link href="/cla/site-policy">
                 <Anchor<"a"> size="xs">termos de uso</Anchor>
               </Link>{" "}
               e{" "}
-              <Link href="/">
+              <Link href="/cla/site-policy">
                 <Anchor<"a"> size="xs">políticas de privacidade</Anchor>
               </Link>{" "}
               da plataforma

@@ -27,7 +27,7 @@ export default function Custom404() {
           }}
         />
 
-        <h1>Ops! Parece que esta página ainda não existe :(</h1>
+        <h1>Ops! Parece que essa página ainda não existe :(</h1>
         <Link href="/">
           <Button variant="outline">Voltar para o inicio</Button>
         </Link>
