@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GithubProvider from "next-auth/providers/github";
+import { laedsGithubSignIn } from "services";
 
 export default NextAuth({
   providers: [
@@ -27,8 +28,40 @@ export default NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account.provider === "GitHubProvider") {
+        try {
+          const response = await laedsGithubSignIn();
+
+          account.access_token = response.token;
+
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      return false;
+    },
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+
+      return session;
+    },
+  },
   pages: {
     signIn: "/auth/signin",
+  },
+  session: {
+    strategy: "jwt",
   },
   secret: process.env.SECRET,
 });

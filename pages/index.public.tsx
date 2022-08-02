@@ -1,4 +1,4 @@
-import { useMantineColorScheme, useMantineTheme } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import { BasicLayout } from "layouts";
 import type { NextPage } from "next";
 
