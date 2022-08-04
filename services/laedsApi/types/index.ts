@@ -1,1 +1,2 @@
-export * from "./SignupData";
+export * from "./SignupData.type";
+export * from "./GithubSignIn.type";

@@ -1,14 +1,14 @@
 import { AxiosResponse } from "axios";
 import { laedsApiInstance } from ".";
-import { SignupData } from "./types";
+import { GithubSignInType, SignupDataType } from "./types";
 
-export const laedsGithubSignIn = async () => {
-  const response = await laedsApiInstance.post("/auth/github", {});
+export const laedsGithubSignIn = async (githubData: GithubSignInType) => {
+  const response = await laedsApiInstance.post("/auth/github", githubData);
 
   return checkResponse(response);
 };
 
-export const laedsSignup = async (signupData: SignupData) => {
+export const laedsSignup = async (signupData: SignupDataType) => {
   const response = await laedsApiInstance.post("/auth/signup", signupData);
 
   return checkResponse(response);
