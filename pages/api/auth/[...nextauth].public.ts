@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import { laedsGithubSignIn } from "services";
+import { laedsGetUserScope, laedsGithubSignIn } from "services";
 
 export default NextAuth({
   providers: [
@@ -55,6 +55,18 @@ export default NextAuth({
     async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
+      }
+
+      if (token.accessToken) {
+        try {
+          const access_token = token.accessToken as string;
+          const response = await laedsGetUserScope(access_token);
+          const scopes = response.data.scope as string[];
+
+          token.scopes = scopes;
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       return token;
