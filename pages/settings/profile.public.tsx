@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Container,
   createStyles,
@@ -44,6 +45,7 @@ const ProfileContent = () => {
   const theme = useMantineTheme();
   const { classes } = useClasses();
 
+  const [profileImageUrl, setProfileImageUrl] = useState<string>();
   const [rteValue, setRteValue] = useState(initialValue);
   const [linksLength, setLinksLength] = useState(0);
 
@@ -83,41 +85,49 @@ const ProfileContent = () => {
   return (
     <form className={classes.form} onSubmit={handleSubmitForm}>
       <Paper className={classes.presentationCard} withBorder p={"lg"}>
-        <Dropzone
-          className={classes.presentationCardDropzone}
-          radius={20}
-          onDrop={files => console.log("accepted files", files)}
-          onReject={files => console.log("rejected files", files)}
-          maxSize={3 * 1024 ** 2}
-          accept={IMAGE_MIME_TYPE}
-        >
-          <Stack align={"center"}>
-            <Dropzone.Accept>
-              <IconUpload
-                size={50}
-                stroke={1.5}
-                color={
-                  theme.colors[theme.primaryColor][
-                    theme.colorScheme === "dark" ? 4 : 6
-                  ]
-                }
-              />
-            </Dropzone.Accept>
-            <Dropzone.Reject>
-              <IconX
-                size={50}
-                stroke={1.5}
-                color={theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]}
-              />
-            </Dropzone.Reject>
-            <Dropzone.Idle>
-              <Stack align={"center"}>
-                <IconPhoto size={50} stroke={1.5} />
-                <Text>Foto de Perfil</Text>
-              </Stack>
-            </Dropzone.Idle>
-          </Stack>
-        </Dropzone>
+        <Avatar size={120} radius={120}>
+          <Dropzone
+            className={classes.presentationCardDropzone}
+            radius={20}
+            onDrop={file => {
+              const imageUrl = URL.createObjectURL(file[0]);
+
+              setProfileImageUrl(imageUrl);
+            }}
+            onReject={files => console.log("rejected files", files)}
+            maxSize={3 * 1024 ** 2}
+            accept={IMAGE_MIME_TYPE}
+          >
+            <Stack align={"center"}>
+              <Dropzone.Accept>
+                <IconUpload
+                  size={50}
+                  stroke={1.5}
+                  color={
+                    theme.colors[theme.primaryColor][
+                      theme.colorScheme === "dark" ? 4 : 6
+                    ]
+                  }
+                />
+              </Dropzone.Accept>
+              <Dropzone.Reject>
+                <IconX
+                  size={50}
+                  stroke={1.5}
+                  color={theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]}
+                />
+              </Dropzone.Reject>
+              <Dropzone.Idle>
+                {profileImageUrl ? (
+                  <Avatar src={profileImageUrl} size={120} radius={120} />
+                ) : (
+                  <IconPhoto size={50} stroke={1.5} />
+                )}
+              </Dropzone.Idle>
+            </Stack>
+          </Dropzone>
+        </Avatar>
+
         <div className={classes.presentationCardInputs}>
           <TextInput label="Nome" required />
           <Textarea label="Bio" required />
@@ -194,7 +204,12 @@ const useClasses = createStyles((theme, _params, getRef) => ({
 
   presentationCardDropzone: {
     ref: getRef("presentationCardDropzone"),
-    width: "20rem",
+    width: "100%",
+    height: "100%",
+    borderRadius: "10rem",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   presentationCardInputs: {
