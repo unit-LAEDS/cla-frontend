@@ -10,6 +10,8 @@ import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
+import { UserProvider } from "context";
+import { ModalsProvider } from "@mantine/modals";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -44,9 +46,13 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           withGlobalStyles
           withNormalizeCSS
         >
-          <NotificationsProvider>
-            <Component {...pageProps} />
-          </NotificationsProvider>
+          <ModalsProvider>
+            <NotificationsProvider>
+              <UserProvider>
+                <Component {...pageProps} />
+              </UserProvider>
+            </NotificationsProvider>
+          </ModalsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </SessionProvider>

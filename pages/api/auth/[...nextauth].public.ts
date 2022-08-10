@@ -40,7 +40,9 @@ export default NextAuth({
             access_token: account.access_token!,
           });
 
-          account.access_token = response.token;
+          let access_token = response.data.access_token;
+
+          account.access_token = access_token;
 
           return true;
         } catch (error) {
