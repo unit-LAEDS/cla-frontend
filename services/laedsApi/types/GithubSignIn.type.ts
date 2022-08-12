@@ -4,4 +4,6 @@ export type GithubSignInType = {
   email: string;
   image: string;
   access_token: string;
+  githubLink: string;
+  bio: string;
 };

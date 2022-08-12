@@ -11,15 +11,19 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { useForm } from "@mantine/form";
 import { useMediaQuery } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import RichTextEditor from "components/RichText";
+import { UserContext } from "context";
 import { BasicLayout } from "layouts";
-import React, { useState } from "react";
-import { SocialMediaFormList } from "./components/SocialMediaFormList";
-
-const initialValue = "<p>Escreva como se a sua vida dependesse disso 👍</p>";
+import React, { useContext, useEffect, useState } from "react";
+import { laedsPostUpdateUserProfile } from "services";
+import {
+  socialLinks,
+  SocialMediaFormList,
+} from "./components/SocialMediaFormList";
 
 const Profile = () => {
   const { classes } = useClasses();
@@ -42,23 +46,30 @@ const Profile = () => {
 };
 
 const ProfileContent = () => {
+  const { laedsUser, updateUserInfo } = useContext(UserContext);
+
   const theme = useMantineTheme();
   const { classes } = useClasses();
+  const [loadingButton, setLoadingButton] = useState(false);
 
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
-  const [rteValue, setRteValue] = useState(initialValue);
-  const [linksLength, setLinksLength] = useState(0);
+  const [rteValue, setRteValue] = useState(laedsUser!.about || "");
+  const [socialMediaLinks, setSocialMediaLinks] = useState<socialLinks>([]);
+  const [links, setLinks] = useState<socialLinks>([]);
 
-  const handleSubmitForm = (event: React.FormEvent) => {
+  const form = useForm({
+    initialValues: {
+      name: laedsUser!.name || "",
+      bio: laedsUser!.bio || "",
+    },
+  });
+
+  const handleSubmitForm = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    let emptyRte = rteValue === "<p><br></p>" || rteValue === initialValue;
+    let emptyRte = rteValue === "<p><br></p>" || rteValue === "";
 
-    if (!emptyRte && linksLength > 0) {
-      return;
-    }
-
-    if (linksLength === 0) {
+    if (socialMediaLinks.length === 0) {
       showNotification({
         autoClose: 10000,
         title: "Venda um pouco mais dos seus dados pessoais 🙂",
@@ -76,11 +87,43 @@ const ProfileContent = () => {
         color: "red",
       });
     }
+
+    setLoadingButton(true);
+    try {
+      await laedsPostUpdateUserProfile({
+        name: form.values.name.trim(),
+        bio: form.values.bio.trim(),
+        about: rteValue,
+        socialMediaLinks: socialMediaLinks,
+      });
+
+      updateUserInfo();
+    } catch (error) {
+      showNotification({
+        title: "Ops...",
+        message: "Tivemos algum erro no servidor!",
+        color: "red",
+      });
+    }
+    setLoadingButton(false);
   };
 
-  const handleSocialMediaLinks = (links: number) => {
-    setLinksLength(links);
+  const handleSocialMediaLinks = (links: socialLinks) => {
+    setSocialMediaLinks(links);
   };
+
+  useEffect(() => {
+    if (laedsUser) {
+      setProfileImageUrl(laedsUser.image);
+      setLinks(
+        laedsUser.SocialMediaLinks.map(link => ({
+          key: link.id,
+          name: link.name,
+          value: link.value,
+        }))
+      );
+    }
+  }, []);
 
   return (
     <form className={classes.form} onSubmit={handleSubmitForm}>
@@ -129,16 +172,20 @@ const ProfileContent = () => {
         </Avatar>
 
         <div className={classes.presentationCardInputs}>
-          <TextInput label="Nome" required />
-          <Textarea label="Bio" required />
+          <TextInput label="Nome" required {...form.getInputProps("name")} />
+          <Textarea label="Bio" required {...form.getInputProps("bio")} />
         </div>
       </Paper>
 
       <Paper className={classes.socialMediaLinks} withBorder p={"lg"}>
-        <SocialMediaFormList socialMediaLinks={handleSocialMediaLinks} />
+        <SocialMediaFormList
+          socialMediaLinks={handleSocialMediaLinks}
+          links={links}
+        />
       </Paper>
 
       <RichTextEditor
+        placeholder="Escreva como se a sua vida dependesse disso 👍"
         style={{
           width: "100%",
           padding: 0,
@@ -156,7 +203,9 @@ const ProfileContent = () => {
         ]}
       />
 
-      <Button type="submit">Salvar</Button>
+      <Button type="submit" loading={loadingButton}>
+        Salvar
+      </Button>
     </form>
   );
 };

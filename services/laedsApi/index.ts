@@ -16,5 +16,12 @@ laedsApiInstance.interceptors.request.use(async config => {
   return config;
 });
 
+export interface LaedsDefaultResponse {
+  code: number;
+  message: string;
+  data: any;
+}
+
 export * from "./auth";
 export * from "./user";
+export * from "./interfaces";

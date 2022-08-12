@@ -29,7 +29,7 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account.provider === "GitHubProvider") {
         try {
           const response = await laedsGithubSignIn({
@@ -38,6 +38,8 @@ export default NextAuth({
             email: user.email!,
             image: user.image!,
             access_token: account.access_token!,
+            githubLink: profile.html_url as string,
+            bio: profile.bio as string,
           });
 
           let access_token = response.data.access_token;
