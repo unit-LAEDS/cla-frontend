@@ -2,7 +2,7 @@ export interface LaedsUser {
   image: string;
   name: string;
   bio: string;
-  about: null;
+  about: string | null;
   SocialMediaLinks: SocialMediaLink[];
 }
 

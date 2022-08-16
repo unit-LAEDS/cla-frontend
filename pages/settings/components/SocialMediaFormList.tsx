@@ -11,7 +11,8 @@ import {
 } from "@mantine/core";
 import { randomId } from "@mantine/hooks";
 import { Trash } from "tabler-icons-react";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { UserContext } from "context";
 
 export type socialLinks = {
   name: string;
@@ -21,13 +22,12 @@ export type socialLinks = {
 
 interface SocialMediaFormListInterface {
   socialMediaLinks: (links: socialLinks) => void;
-  links: socialLinks | undefined;
 }
 
 const SocialMediaFormList = ({
   socialMediaLinks,
-  links,
 }: SocialMediaFormListInterface) => {
+  const { laedsUser } = useContext(UserContext);
   const form = useForm({
     initialValues: {
       socialLinks: [{ name: "", value: "", key: randomId() }],
@@ -35,22 +35,25 @@ const SocialMediaFormList = ({
   });
 
   useEffect(() => {
-    links &&
-      links.map((link, index) => {
+    if (laedsUser?.SocialMediaLinks) {
+      form.reset();
+
+      laedsUser?.SocialMediaLinks.map((link, index) => {
         if (index === 0) {
           form.setFieldValue(`socialLinks.${index}.name`, link.name);
           form.setFieldValue(`socialLinks.${index}.value`, link.value);
-          form.setFieldValue(`socialLinks.${index}.key`, link.key);
+          form.setFieldValue(`socialLinks.${index}.key`, link.id);
           return;
         }
 
         form.insertListItem("socialLinks", {
           name: link.name,
           value: link.value,
-          key: link.key,
+          key: link.id,
         });
       });
-  }, [links]);
+    }
+  }, [laedsUser]);
 
   const fields = form.values.socialLinks.map((item, index) => (
     <Group

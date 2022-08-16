@@ -14,16 +14,36 @@ import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { useMediaQuery } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
+import { authOptions } from "@pages/api/auth/[...nextauth].public";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import RichTextEditor from "components/RichText";
 import { UserContext } from "context";
 import { BasicLayout } from "layouts";
+import { GetServerSideProps } from "next";
+import { unstable_getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import React, { useContext, useEffect, useState } from "react";
 import { laedsPostUpdateUserProfile } from "services";
 import {
   socialLinks,
   SocialMediaFormList,
 } from "./components/SocialMediaFormList";
+
+const secret = process.env.SECRET;
+
+// export const getServerSideProps: GetServerSideProps = async context => {
+//   const session = await unstable_getServerSession(
+//     context.req,
+//     context.res,
+//     authOptions
+//   );
+
+//   return {
+//     props: {
+//       bio: session?.user.
+//     },
+//   };
+// };
 
 const Profile = () => {
   const { classes } = useClasses();
@@ -53,14 +73,14 @@ const ProfileContent = () => {
   const [loadingButton, setLoadingButton] = useState(false);
 
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
-  const [rteValue, setRteValue] = useState(laedsUser!.about || "");
+  const [imageFile, setImageFile] = useState<string>();
+  const [rteValue, setRteValue] = useState(laedsUser?.about || "");
   const [socialMediaLinks, setSocialMediaLinks] = useState<socialLinks>([]);
-  const [links, setLinks] = useState<socialLinks>([]);
 
   const form = useForm({
     initialValues: {
-      name: laedsUser!.name || "",
-      bio: laedsUser!.bio || "",
+      name: "",
+      bio: "",
     },
   });
 
@@ -70,7 +90,7 @@ const ProfileContent = () => {
     let emptyRte = rteValue === "<p><br></p>" || rteValue === "";
 
     if (socialMediaLinks.length === 0) {
-      showNotification({
+      return showNotification({
         autoClose: 10000,
         title: "Venda um pouco mais dos seus dados pessoais 🙂",
         message: "Adicione pelo menos uma rede social!",
@@ -79,7 +99,7 @@ const ProfileContent = () => {
     }
 
     if (emptyRte) {
-      showNotification({
+      return showNotification({
         autoClose: 10000,
         title: "Escreva um pouco mais sobre você",
         message:
@@ -91,6 +111,7 @@ const ProfileContent = () => {
     setLoadingButton(true);
     try {
       await laedsPostUpdateUserProfile({
+        image: imageFile,
         name: form.values.name.trim(),
         bio: form.values.bio.trim(),
         about: rteValue,
@@ -114,16 +135,13 @@ const ProfileContent = () => {
 
   useEffect(() => {
     if (laedsUser) {
+      form.setFieldValue("name", laedsUser.name);
+      form.setFieldValue("bio", laedsUser.bio);
+
+      setRteValue(laedsUser.about || "");
       setProfileImageUrl(laedsUser.image);
-      setLinks(
-        laedsUser.SocialMediaLinks.map(link => ({
-          key: link.id,
-          name: link.name,
-          value: link.value,
-        }))
-      );
     }
-  }, []);
+  }, [laedsUser]);
 
   return (
     <form className={classes.form} onSubmit={handleSubmitForm}>
@@ -133,6 +151,12 @@ const ProfileContent = () => {
             className={classes.presentationCardDropzone}
             radius={20}
             onDrop={file => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setImageFile(reader.result as string);
+              };
+              reader.readAsDataURL(file[0]);
+
               const imageUrl = URL.createObjectURL(file[0]);
 
               setProfileImageUrl(imageUrl);
@@ -178,10 +202,7 @@ const ProfileContent = () => {
       </Paper>
 
       <Paper className={classes.socialMediaLinks} withBorder p={"lg"}>
-        <SocialMediaFormList
-          socialMediaLinks={handleSocialMediaLinks}
-          links={links}
-        />
+        <SocialMediaFormList socialMediaLinks={handleSocialMediaLinks} />
       </Paper>
 
       <RichTextEditor

@@ -1,4 +1,5 @@
 export type UpdateUserProfile = {
+  image?: string;
   name: string;
   bio: string;
   about: string;

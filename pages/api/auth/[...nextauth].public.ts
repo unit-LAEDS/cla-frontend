@@ -1,9 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
 import { laedsGetUserScope, laedsGithubSignIn } from "services";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
       id: "GitHubProvider",
@@ -86,4 +86,6 @@ export default NextAuth({
     strategy: "jwt",
   },
   secret: process.env.SECRET,
-});
+};
+
+export default NextAuth(authOptions);
