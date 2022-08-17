@@ -1,5 +1,7 @@
+import { Player } from "@lottiefiles/react-lottie-player";
 import {
   Avatar,
+  Button,
   Card,
   Container,
   createStyles,
@@ -7,8 +9,9 @@ import {
   Paper,
   Skeleton,
   Text,
+  Title,
+  TypographyStylesProvider,
 } from "@mantine/core";
-import RichTextEditor from "components/RichText";
 import { ContainerEnum } from "global";
 import { BasicLayout } from "layouts";
 import {
@@ -16,108 +19,90 @@ import {
   GetStaticProps,
   InferGetStaticPropsType,
   NextPage,
+  PreviewData,
 } from "next";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { xaropinho } from "public";
-import { useEffect, useState } from "react";
-import { fetchGitHubInfo } from "services";
+import Link from "next/link";
+import { error404, notFound } from "public";
+import { ParsedUrlQuery } from "querystring";
+import { useState } from "react";
+import { laedsGetUser, laedsGetUsernames, LaedsUser } from "services";
 
-const initialValue =
-  "<p>Insira seu <b>username</b> do GitHub na url <br> Ex: laeds.org/NahtanN </p>";
-
-export const getStaticProps: GetStaticProps = context => {
+export const getStaticProps: GetStaticProps<
+  {
+    [key: string]: LaedsUser;
+  },
+  ParsedUrlQuery,
+  PreviewData
+> = async context => {
   const param = context.params;
   const username = param!.username;
 
+  const user = await laedsGetUser(username as string);
+
   return {
     props: {
-      username,
+      user,
     },
+    revalidate: 10,
   };
 };
 
-export const getStaticPaths: GetStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const users = await laedsGetUsernames();
+
+  const paths = users.map(user => ({
+    params: {
+      username: user.username,
+    },
+  }));
+
   return {
-    paths: [],
+    paths,
     fallback: "blocking",
   };
 };
 
 const UsernameProfile: NextPage = ({
-  username,
+  user,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { data: session } = useSession();
-  const { asPath } = useRouter();
   const { classes } = useClasses();
 
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<{
-    image?: string | null | undefined;
-    name?: string | null | undefined;
-    bio?: string | null | undefined;
-    socialMedia: {
-      name?: string | null | undefined;
-      link?: string | null | undefined;
-    }[];
-  }>();
 
-  const handleGitHubFetch = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchGitHubInfo(username);
-      setLoading(false);
+  if (!user) {
+    return (
+      <BasicLayout
+        title="CLA | LAEDS"
+        description="Central das Ligas Acadêmicas | LAEDS"
+      >
+        <section className={classes.section}>
+          <Player
+            autoplay
+            loop
+            src={notFound}
+            style={{
+              maxHeight: "500px",
+              height: "100%",
+              maxWidth: "500px",
+              width: "100%",
+            }}
+          />
 
-      setUser({
-        image: data.avatar_url,
-        name: data.name,
-        bio: data.bio,
-        socialMedia: [
-          {
-            link: data.html_url,
-            name: "GitHub",
-          },
-        ],
-      });
-    } catch (err) {
-      setLoading(false);
-
-      setUser({
-        image: xaropinho.src,
-        name: "Xaropinho",
-        bio: "Comfortably Numb - Live (Pulse Show)",
-        socialMedia: [],
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (session) {
-      let user = session.user;
-      let urlPath = user?.name?.split(" ").join("");
-
-      asPath.replace("/", "") === `user/${urlPath}`
-        ? setUser({
-            image: user?.image,
-            name: user?.name,
-            bio: "",
-            socialMedia: [
-              {
-                link: user?.email,
-                name: "E-mail",
-              },
-            ],
-          })
-        : handleGitHubFetch();
-    }
-
-    if (session === null) handleGitHubFetch();
-  }, [session, asPath]);
+          <Title order={2}>
+            Ops! Parece que esse usuário ainda não existe.
+          </Title>
+          <Link href="/auth/signin">
+            <Button variant="outline">Esse username pode ser seu !!!</Button>
+          </Link>
+        </section>
+      </BasicLayout>
+    );
+  }
 
   return (
     <BasicLayout
-      title={`CLA | ${username}`}
-      description={`CLA | Perfil do ${username}`}
+      title={`CLA | ${user.username}`}
+      description={`CLA | Perfil do ${user.username}`}
     >
       <Container size={ContainerEnum.size} className={classes.container}>
         <section className={classes.basicInfo}>
@@ -151,12 +136,12 @@ const UsernameProfile: NextPage = ({
                 <Skeleton height={8} mt={10} radius="lg" />
               </>
             )}
-            {user?.socialMedia.map(media => (
+            {user?.SocialMediaLinks.map(media => (
               <div className={classes.socialMedia}>
                 <Text size="sm">{media.name}</Text>
-                <a href={`${media.link}`} target={"_blank"}>
+                <a href={`${media.value}`} target={"_blank"}>
                   <Text size="xs" color="dimmed">
-                    {`${media.link}`}
+                    {`${media.value}`}
                   </Text>
                 </a>
               </div>
@@ -164,17 +149,23 @@ const UsernameProfile: NextPage = ({
           </Card>
         </section>
         <section className={classes.userDetails}>
-          <RichTextEditor
-            p={0}
-            style={{
-              width: "100%",
-              padding: 0,
-              margin: 0,
-            }}
-            readOnly
-            value={initialValue}
-            onChange={() => {}}
-          />
+          <Paper
+            shadow="xl"
+            p="lg"
+            withBorder
+            sx={theme => ({
+              backgroundColor:
+                theme.colorScheme === "dark" ? theme.colors.gray : "",
+            })}
+          >
+            <TypographyStylesProvider>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: user.about || "<p>Nada a declarar 🤷‍♀️</p>",
+                }}
+              />
+            </TypographyStylesProvider>
+          </Paper>
         </section>
       </Container>
     </BasicLayout>
@@ -182,6 +173,13 @@ const UsernameProfile: NextPage = ({
 };
 
 const useClasses = createStyles(theme => ({
+  section: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "5rem",
+  },
+
   container: {
     display: "flex",
     flexWrap: "wrap",

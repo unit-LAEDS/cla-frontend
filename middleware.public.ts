@@ -47,5 +47,5 @@ export const middleware: NextMiddleware = async (req: NextRequest) => {
 };
 
 export const config = {
-  matcher: ["/", "/select-username", "/settings/:path*"],
+  matcher: ["/", "/select-username", "/settings/:path*", "/user/:path*"],
 };

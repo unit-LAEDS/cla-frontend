@@ -13,12 +13,30 @@ export const laedsGetUserScope = async (access_token: string) => {
   return checkResponse(response);
 };
 
-export const laedsGetUser = async (access_token: string) => {
+export const laedsGetUserProfile = async (access_token: string) => {
   const response = await laedsApiInstance.get("/user", {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
   });
+  const laedsResponse = await checkResponse(response);
+
+  return laedsResponse.data as LaedsUser;
+};
+
+export const laedsGetUsernames = async () => {
+  const response = await laedsApiInstance.get("/user/usernames");
+
+  const laedsResponse = await checkResponse(response);
+
+  return laedsResponse.data as {
+    username: string;
+  }[];
+};
+
+export const laedsGetUser = async (username: string) => {
+  const response = await laedsApiInstance.get(`/user/${username}`);
+
   const laedsResponse = await checkResponse(response);
 
   return laedsResponse.data as LaedsUser;

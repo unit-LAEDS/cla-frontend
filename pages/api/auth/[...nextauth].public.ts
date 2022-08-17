@@ -1,7 +1,11 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import { laedsGetUser, laedsGetUserScope, laedsGithubSignIn } from "services";
+import {
+  laedsGetUserProfile,
+  laedsGetUserScope,
+  laedsGithubSignIn,
+} from "services";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -79,9 +83,10 @@ export const authOptions: NextAuthOptions = {
       if (accessToken) {
         session.accessToken = accessToken;
 
-        const laedsUser = await laedsGetUser(accessToken);
+        const laedsUser = await laedsGetUserProfile(accessToken);
 
         session.user = {
+          username: laedsUser.username,
           name: laedsUser.name,
           email: laedsUser.email,
           image: laedsUser.image,

@@ -1,4 +1,5 @@
 export interface LaedsUser {
+  username: string;
   image: string;
   name: string;
   email: string;

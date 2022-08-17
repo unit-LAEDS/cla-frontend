@@ -63,9 +63,7 @@ export const DefaultHeader = () => {
 
   useEffect(() => {
     if (session) {
-      let linkHref = session.user?.name?.split(" ").join("");
-
-      return setProfileLink(linkHref!);
+      return setProfileLink(session.user.username);
     }
 
     setProfileLink("/uuuueeeeppa");
