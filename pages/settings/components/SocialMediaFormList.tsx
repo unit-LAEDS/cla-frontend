@@ -13,6 +13,7 @@ import { randomId } from "@mantine/hooks";
 import { Trash } from "tabler-icons-react";
 import { useContext, useEffect } from "react";
 import { UserContext } from "context";
+import { SocialMediaLink } from "@Types/next-auth";
 
 export type socialLinks = {
   name: string;
@@ -22,12 +23,13 @@ export type socialLinks = {
 
 interface SocialMediaFormListInterface {
   socialMediaLinks: (links: socialLinks) => void;
+  links: SocialMediaLink[];
 }
 
 const SocialMediaFormList = ({
   socialMediaLinks,
+  links,
 }: SocialMediaFormListInterface) => {
-  const { laedsUser } = useContext(UserContext);
   const form = useForm({
     initialValues: {
       socialLinks: [{ name: "", value: "", key: randomId() }],
@@ -35,10 +37,10 @@ const SocialMediaFormList = ({
   });
 
   useEffect(() => {
-    if (laedsUser?.SocialMediaLinks) {
+    if (links) {
       form.reset();
 
-      laedsUser?.SocialMediaLinks.map((link, index) => {
+      links.map((link, index) => {
         if (index === 0) {
           form.setFieldValue(`socialLinks.${index}.name`, link.name);
           form.setFieldValue(`socialLinks.${index}.value`, link.value);
@@ -53,7 +55,7 @@ const SocialMediaFormList = ({
         });
       });
     }
-  }, [laedsUser]);
+  }, [links]);
 
   const fields = form.values.socialLinks.map((item, index) => (
     <Group

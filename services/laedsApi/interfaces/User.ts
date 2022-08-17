@@ -1,6 +1,7 @@
 export interface LaedsUser {
   image: string;
   name: string;
+  email: string;
   bio: string;
   about: string | null;
   SocialMediaLinks: SocialMediaLink[];

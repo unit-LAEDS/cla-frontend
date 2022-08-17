@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
-import { laedsGetUserScope, laedsGithubSignIn } from "services";
+import { laedsGetUser, laedsGetUserScope, laedsGithubSignIn } from "services";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -74,7 +74,23 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
+      let accessToken = token.accessToken as string;
+
+      if (accessToken) {
+        session.accessToken = accessToken;
+
+        const laedsUser = await laedsGetUser(accessToken);
+
+        session.user = {
+          name: laedsUser.name,
+          email: laedsUser.email,
+          image: laedsUser.image,
+          bio: laedsUser.bio,
+          about: laedsUser.about,
+          SocialMediaLinks: laedsUser.SocialMediaLinks,
+          scopes: token.scopes as string[],
+        };
+      }
 
       return session;
     },

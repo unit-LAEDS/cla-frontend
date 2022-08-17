@@ -5,7 +5,6 @@ import {
   createStyles,
   Paper,
   Stack,
-  Text,
   Textarea,
   TextInput,
   useMantineTheme,
@@ -14,36 +13,17 @@ import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { useMediaQuery } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
-import { authOptions } from "@pages/api/auth/[...nextauth].public";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import RichTextEditor from "components/RichText";
 import { UserContext } from "context";
 import { BasicLayout } from "layouts";
-import { GetServerSideProps } from "next";
-import { unstable_getServerSession } from "next-auth";
-import { getToken } from "next-auth/jwt";
+import { useSession } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
 import { laedsPostUpdateUserProfile } from "services";
 import {
   socialLinks,
   SocialMediaFormList,
 } from "./components/SocialMediaFormList";
-
-const secret = process.env.SECRET;
-
-// export const getServerSideProps: GetServerSideProps = async context => {
-//   const session = await unstable_getServerSession(
-//     context.req,
-//     context.res,
-//     authOptions
-//   );
-
-//   return {
-//     props: {
-//       bio: session?.user.
-//     },
-//   };
-// };
 
 const Profile = () => {
   const { classes } = useClasses();
@@ -66,7 +46,8 @@ const Profile = () => {
 };
 
 const ProfileContent = () => {
-  const { laedsUser, updateUserInfo } = useContext(UserContext);
+  const { data: session } = useSession();
+  const { reloadSession } = useContext(UserContext);
 
   const theme = useMantineTheme();
   const { classes } = useClasses();
@@ -74,7 +55,7 @@ const ProfileContent = () => {
 
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
   const [imageFile, setImageFile] = useState<string>();
-  const [rteValue, setRteValue] = useState(laedsUser?.about || "");
+  const [rteValue, setRteValue] = useState("");
   const [socialMediaLinks, setSocialMediaLinks] = useState<socialLinks>([]);
 
   const form = useForm({
@@ -118,7 +99,7 @@ const ProfileContent = () => {
         socialMediaLinks: socialMediaLinks,
       });
 
-      updateUserInfo();
+      reloadSession();
     } catch (error) {
       showNotification({
         title: "Ops...",
@@ -134,14 +115,16 @@ const ProfileContent = () => {
   };
 
   useEffect(() => {
-    if (laedsUser) {
-      form.setFieldValue("name", laedsUser.name);
-      form.setFieldValue("bio", laedsUser.bio);
+    if (session) {
+      let { name, bio, about, image } = session.user;
 
-      setRteValue(laedsUser.about || "");
-      setProfileImageUrl(laedsUser.image);
+      form.setFieldValue("name", name!);
+      form.setFieldValue("bio", bio);
+
+      setRteValue(about || "");
+      setProfileImageUrl(image!);
     }
-  }, [laedsUser]);
+  }, [session]);
 
   return (
     <form className={classes.form} onSubmit={handleSubmitForm}>
@@ -202,7 +185,10 @@ const ProfileContent = () => {
       </Paper>
 
       <Paper className={classes.socialMediaLinks} withBorder p={"lg"}>
-        <SocialMediaFormList socialMediaLinks={handleSocialMediaLinks} />
+        <SocialMediaFormList
+          socialMediaLinks={handleSocialMediaLinks}
+          links={session?.user.SocialMediaLinks!}
+        />
       </Paper>
 
       <RichTextEditor
