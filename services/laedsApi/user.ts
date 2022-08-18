@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { laedsApiInstance, LaedsDefaultResponse } from ".";
-import { LaedsUser } from "./interfaces";
+import { LaedsUser, LaedsUsersProfiles } from "./interfaces";
 import { UpdateUserProfile } from "./types";
 
 export const laedsGetUserScope = async (access_token: string) => {
@@ -62,6 +62,14 @@ export const laedsPostUpdateUserProfile = async (
   const response = await laedsApiInstance.post("/user", updateUserProfile);
 
   return checkResponse(response);
+};
+
+export const laedsGetUsersProfiles = async () => {
+  const response = await laedsApiInstance.get("/user/profiles");
+
+  const laedsResponse = await checkResponse(response);
+
+  return laedsResponse.data as LaedsUsersProfiles[];
 };
 
 const checkResponse = async (response: AxiosResponse) => {

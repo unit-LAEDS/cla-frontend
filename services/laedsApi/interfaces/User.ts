@@ -8,6 +8,13 @@ export interface LaedsUser {
   SocialMediaLinks: SocialMediaLink[];
 }
 
+export interface LaedsUsersProfiles {
+  image: string;
+  username: string;
+  name: string;
+  bio: string;
+}
+
 export interface SocialMediaLink {
   id: string;
   name: string;
