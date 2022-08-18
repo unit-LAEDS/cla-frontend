@@ -13,6 +13,7 @@ import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { useMediaQuery } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
+import { NextPageWithLayout } from "@pages/_app.public";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons";
 import RichTextEditor from "components/RichText";
 import { UserContext } from "context";
@@ -25,15 +26,12 @@ import {
   SocialMediaFormList,
 } from "./components/SocialMediaFormList";
 
-const Profile = () => {
+const Profile: NextPageWithLayout = () => {
   const { classes } = useClasses();
   const matches = useMediaQuery("(min-width: 425px)");
 
   return (
-    <BasicLayout
-      title="CLA | Configurações | Perfil"
-      description="Central das Ligas Acadêmicas | LAEDS"
-    >
+    <>
       {matches ? (
         <Container size={"md"} className={classes.container}>
           <ProfileContent />
@@ -41,7 +39,7 @@ const Profile = () => {
       ) : (
         <ProfileContent />
       )}
-    </BasicLayout>
+    </>
   );
 };
 
@@ -277,5 +275,7 @@ const useClasses = createStyles((theme, _params, getRef) => ({
 
   socialMediaLinks: {},
 }));
+
+Profile.PageLayout = BasicLayout;
 
 export default Profile;

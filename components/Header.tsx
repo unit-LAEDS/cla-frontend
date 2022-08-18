@@ -69,6 +69,10 @@ export const DefaultHeader = () => {
     setProfileLink("/uuuueeeeppa");
   }, [session]);
 
+  useEffect(() => {
+    setActive(pathname);
+  }, [pathname]);
+
   return (
     <Header height={HEADER_HEIGHT} mb={30}>
       <Container className={classes.inner} size={ContainerEnum.size}>
@@ -144,6 +148,7 @@ export const DefaultHeader = () => {
                 <Divider />
 
                 <Menu.Item
+                  closeMenuOnClick
                   icon={<User size={14} />}
                   component={NextLink}
                   href={`/user/${profileLink}`}
@@ -152,6 +157,7 @@ export const DefaultHeader = () => {
                 </Menu.Item>
 
                 <Menu.Item
+                  closeMenuOnClick
                   icon={<Settings size={14} />}
                   component={NextLink}
                   href={"/settings/profile"}

@@ -12,6 +12,7 @@ import {
   Title,
   TypographyStylesProvider,
 } from "@mantine/core";
+import { NextPageWithLayout } from "@pages/_app.public";
 import { ContainerEnum } from "global";
 import { BasicLayout } from "layouts";
 import {
@@ -21,6 +22,7 @@ import {
   NextPage,
   PreviewData,
 } from "next";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { error404, notFound } from "public";
 import { ParsedUrlQuery } from "querystring";
@@ -62,113 +64,104 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-const UsernameProfile: NextPage = ({
+const UsernameProfile: NextPageWithLayout = ({
   user,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { data: session } = useSession();
   const { classes } = useClasses();
 
   const [loading, setLoading] = useState(false);
 
   if (!user) {
     return (
-      <BasicLayout
-        title="CLA | LAEDS"
-        description="Central das Ligas Acadêmicas | LAEDS"
-      >
-        <section className={classes.section}>
-          <Player
-            autoplay
-            loop
-            src={notFound}
-            style={{
-              maxHeight: "500px",
-              height: "100%",
-              maxWidth: "500px",
-              width: "100%",
-            }}
-          />
+      <section className={classes.section}>
+        <Player
+          autoplay
+          loop
+          src={notFound}
+          style={{
+            maxHeight: "500px",
+            height: "100%",
+            maxWidth: "500px",
+            width: "100%",
+          }}
+        />
 
-          <Title order={2}>
-            Ops! Parece que esse usuário ainda não existe.
-          </Title>
+        <Title order={2}>Ops! Parece que esse usuário ainda não existe.</Title>
+
+        {session ? (
+          <Link href="/">
+            <Button variant="outline">Voltar para a home</Button>
+          </Link>
+        ) : (
           <Link href="/auth/signin">
             <Button variant="outline">Esse username pode ser seu !!!</Button>
           </Link>
-        </section>
-      </BasicLayout>
+        )}
+      </section>
     );
   }
 
   return (
-    <BasicLayout
-      title={`CLA | ${user.username}`}
-      description={`CLA | Perfil do ${user.username}`}
-    >
-      <Container size={ContainerEnum.size} className={classes.container}>
-        <section className={classes.basicInfo}>
-          <Paper
-            radius="md"
-            withBorder
-            className={classes.basicInfoPaper}
-            p="lg"
+    <Container size={ContainerEnum.size} className={classes.container}>
+      <section className={classes.basicInfo}>
+        <Paper radius="md" withBorder className={classes.basicInfoPaper} p="lg">
+          <Avatar src={user?.image} size={120} radius={120} mx="auto" />
+          <Text align="center" size="lg" weight={500} mt="md">
+            {loading ? <Skeleton height={8} radius="lg" /> : user?.name}
+          </Text>
+          <Text
+            align="center"
+            color="dimmed"
+            size="sm"
+            style={{
+              wordBreak: "break-word",
+            }}
           >
-            <Avatar src={user?.image} size={120} radius={120} mx="auto" />
-            <Text align="center" size="lg" weight={500} mt="md">
-              {loading ? <Skeleton height={8} radius="lg" /> : user?.name}
-            </Text>
-            <Text
-              align="center"
-              color="dimmed"
-              size="sm"
-              style={{
-                wordBreak: "break-word",
-              }}
-            >
-              {user?.bio}
-            </Text>
-          </Paper>
+            {user?.bio}
+          </Text>
+        </Paper>
 
-          <Card withBorder>
-            <Divider label={<Text>Redes Sociais</Text>} />
-            {loading && (
-              <>
-                <Skeleton height={8} mt={10} width="50%" radius="lg" />
-                <Skeleton height={8} mt={10} radius="lg" />
-              </>
-            )}
-            {user?.SocialMediaLinks.map(media => (
-              <div className={classes.socialMedia}>
-                <Text size="sm">{media.name}</Text>
-                <a href={`${media.value}`} target={"_blank"}>
-                  <Text size="xs" color="dimmed">
-                    {`${media.value}`}
-                  </Text>
-                </a>
-              </div>
-            ))}
-          </Card>
-        </section>
-        <section className={classes.userDetails}>
-          <Paper
-            shadow="xl"
-            p="lg"
-            withBorder
-            sx={theme => ({
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.gray : "",
-            })}
-          >
-            <TypographyStylesProvider>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: user.about || "<p>Nada a declarar 🤷‍♀️</p>",
-                }}
-              />
-            </TypographyStylesProvider>
-          </Paper>
-        </section>
-      </Container>
-    </BasicLayout>
+        <Card withBorder>
+          <Divider label={<Text>Redes Sociais</Text>} />
+          {loading && (
+            <>
+              <Skeleton height={8} mt={10} width="50%" radius="lg" />
+              <Skeleton height={8} mt={10} radius="lg" />
+            </>
+          )}
+          {user?.SocialMediaLinks.map(media => (
+            <div className={classes.socialMedia}>
+              <Text size="sm">{media.name}</Text>
+              <a href={`${media.value}`} target={"_blank"}>
+                <Text size="xs" color="dimmed">
+                  {`${media.value}`}
+                </Text>
+              </a>
+            </div>
+          ))}
+        </Card>
+      </section>
+      <section className={classes.userDetails}>
+        <Paper
+          shadow="xl"
+          p="lg"
+          withBorder
+          sx={theme => ({
+            backgroundColor:
+              theme.colorScheme === "dark" ? theme.colors.gray : "",
+          })}
+        >
+          <TypographyStylesProvider>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: user.about || "<p>Nada a declarar 🤷‍♀️</p>",
+              }}
+            />
+          </TypographyStylesProvider>
+        </Paper>
+      </section>
+    </Container>
   );
 };
 
@@ -222,5 +215,7 @@ const useClasses = createStyles(theme => ({
     marginTop: "1rem",
   },
 }));
+
+UsernameProfile.PageLayout = BasicLayout;
 
 export default UsernameProfile;
