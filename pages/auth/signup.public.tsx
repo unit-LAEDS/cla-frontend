@@ -1,10 +1,10 @@
+import DefineUsername from "@components/DefineUsername";
 import {
   Anchor,
   Box,
   Button,
   Center,
   Container,
-  createStyles,
   Group,
   keyframes,
   Paper,
@@ -17,7 +17,7 @@ import {
 import { useForm } from "@mantine/form";
 import { useInputState } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
-import { IconAt, IconCheck, IconX } from "@tabler/icons";
+import { IconCheck, IconX } from "@tabler/icons";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getToken } from "next-auth/jwt";
 import { getCsrfToken } from "next-auth/react";
@@ -74,6 +74,8 @@ export default function Signup({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [shake, setShake] = useState(false);
   const [value, setValue] = useInputState("");
+
+  const [error, setError] = useState(false);
   const strength = getStrength(value);
   const form = useForm({
     initialValues: {
@@ -85,7 +87,7 @@ export default function Signup({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (strength < 100) {
+    if (strength < 100 || error) {
       setShake(true);
 
       setTimeout(() => setShake(false), 300);
@@ -107,6 +109,14 @@ export default function Signup({
         color: "red",
       });
     }
+  };
+
+  const handleUsernameError = (value: boolean) => {
+    setError(value);
+  };
+
+  const handleGetUsername = (username: string) => {
+    form.setFieldValue("username", username);
   };
 
   function PasswordRequirement({
@@ -171,6 +181,7 @@ export default function Signup({
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
+        marginBottom: "4rem",
       }}
     >
       <Container
@@ -178,16 +189,30 @@ export default function Signup({
           width: "40rem",
         }}
       >
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1rem",
+          }}
+        >
+          <Box
+            sx={theme => ({
+              animation:
+                shake && error
+                  ? `${shakeHorizontal} .8s cubic-bezier(.455,.03,.515,.955) both`
+                  : "",
+            })}
+          >
+            <DefineUsername
+              isError={handleUsernameError}
+              getUsername={handleGetUsername}
+            />
+          </Box>
+
           <Paper withBorder shadow="md" p={30} radius="md">
             <Stack>
-              <TextInput
-                icon={<IconAt size={14} />}
-                label="Username"
-                required
-                placeholder="Xaropinho"
-                {...form.getInputProps("username")}
-              />
               <TextInput
                 label="Email"
                 type={"email"}
