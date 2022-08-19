@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ["public.tsx", "public.ts"],
-  reactStrictMode: true,
+  reactStrictMode: false,
   env: {
     SECRET: process.env.SECRET,
     GITHUB_ID: process.env.GITHUB_ID,

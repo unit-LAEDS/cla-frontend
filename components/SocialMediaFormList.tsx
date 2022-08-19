@@ -1,19 +1,9 @@
+import { ActionIcon, Box, Button, Group, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import {
-  TextInput,
-  Switch,
-  Group,
-  ActionIcon,
-  Box,
-  Text,
-  Button,
-  Code,
-} from "@mantine/core";
 import { randomId } from "@mantine/hooks";
+import { useEffect } from "react";
+import { SocialMediaLink } from "services";
 import { Trash } from "tabler-icons-react";
-import { useContext, useEffect } from "react";
-import { UserContext } from "context";
-import { SocialMediaLink } from "@Types/next-auth";
 
 export type socialLinks = {
   name: string;

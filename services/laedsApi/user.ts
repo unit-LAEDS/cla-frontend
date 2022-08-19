@@ -64,6 +64,16 @@ export const laedsPostUpdateUserProfile = async (
   return checkResponse(response);
 };
 
+export const laedsPostSignin = async (username: string, password: string) => {
+  const response = await laedsApiInstance.post("/auth/signin", {
+    username,
+    password,
+  });
+  const laedsResponse = await checkResponse(response);
+
+  return laedsResponse.data;
+};
+
 export const laedsGetUsersProfiles = async () => {
   const response = await laedsApiInstance.get("/user/profiles");
 

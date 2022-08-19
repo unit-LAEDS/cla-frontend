@@ -10,11 +10,13 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getToken } from "next-auth/jwt";
 import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
+import Router from "next/router";
 import { BrandGithub } from "tabler-icons-react";
 
 const secret = process.env.SECRET;
@@ -46,6 +48,13 @@ export default function Signin({
   csrfToken,
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const form = useForm({
+    initialValues: {
+      username: "",
+      password: "",
+    },
+  });
+
   return (
     <div
       style={{
@@ -72,7 +81,7 @@ export default function Signin({
                   backgroundColor: "#8357e6",
                 },
               })}
-              onClick={() => signIn("GitHubProvider")}
+              onClick={() => signIn("github")}
             >
               GitHub
             </Button>
@@ -84,10 +93,14 @@ export default function Signin({
             my="lg"
           />
 
-          <TextInput label="Email" placeholder="seumelhor@email.com" required />
+          <TextInput
+            {...form.getInputProps("username")}
+            label="Username ou Email"
+            required
+          />
           <PasswordInput
+            {...form.getInputProps("password")}
             label="Senha"
-            placeholder="Sua senha"
             required
             mt="md"
           />
@@ -104,13 +117,23 @@ export default function Signin({
           <Button
             fullWidth
             mt="xl"
-            onClick={() =>
-              showNotification({
-                title: "Opss...",
-                message: "Funcionalidade ainda não implementada 😔",
-                color: "red",
-              })
-            }
+            onClick={async () => {
+              const response = await signIn("credentials", {
+                username: form.values.username,
+                password: form.values.password,
+                redirect: false,
+              });
+
+              if (response?.error) {
+                return showNotification({
+                  title: "Ops...",
+                  message: "Usuário ou senha inválidos!",
+                  color: "red",
+                });
+              }
+
+              Router.push("/");
+            }}
           >
             Entrar
           </Button>

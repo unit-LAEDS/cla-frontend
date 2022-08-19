@@ -5,27 +5,30 @@ import {
   laedsGetUserProfile,
   laedsGetUserScope,
   laedsGithubSignIn,
+  laedsPostSignin,
 } from "services";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
-      id: "GitHubProvider",
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
     }),
     CredentialsProvider({
-      id: "CredentialsProvider",
       name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const user = { id: 1, name: "J Smith", email: "jsmith@example.com" };
+        // const user = { id: 1, name: "J Smith", email: "jsmith@example.com" };
+        const response: any = await laedsPostSignin(
+          credentials?.username!,
+          credentials?.password!
+        );
 
-        if (user) {
-          return user;
+        if (response) {
+          return response;
         } else {
           return null;
         }
@@ -34,7 +37,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account.provider === "GitHubProvider") {
+      if (account.provider === "github") {
         try {
           const response = await laedsGithubSignIn({
             id: user.id,
@@ -56,6 +59,11 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      if (account.provider === "credentials") {
+        account.access_token = user.access_token as string;
+
+        return true;
+      }
       return false;
     },
     async jwt({ token, account }) {

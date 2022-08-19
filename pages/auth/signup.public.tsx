@@ -20,8 +20,9 @@ import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getToken } from "next-auth/jwt";
-import { getCsrfToken } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { laedsSignup } from "services";
 
@@ -99,6 +100,10 @@ export default function Signup({
       await laedsSignup({
         username: form.values.username,
         email: form.values.email,
+        password: value,
+      });
+      signIn("credentials", {
+        username: form.values.email,
         password: value,
       });
     } catch (err) {
