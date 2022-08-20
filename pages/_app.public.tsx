@@ -4,14 +4,26 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
-import { getCookie, setCookies } from "cookies-next";
-import { GetServerSidePropsContext } from "next";
+import { getCookie, setCookie } from "cookies-next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
+import { UserProvider } from "context";
+import { ModalsProvider } from "@mantine/modals";
 
-export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+export type NextPageWithLayout = NextPage & {
+  PageLayout?: React.ElementType;
+};
+
+type ComponentWithPageLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App(
+  props: ComponentWithPageLayout & { colorScheme: ColorScheme }
+) {
   const { Component, pageProps } = props;
   const [colorScheme, setColorScheme] = useState<ColorScheme>(
     props.colorScheme
@@ -22,7 +34,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       value || (colorScheme === "dark" ? "light" : "dark");
 
     setColorScheme(nextColorScheme);
-    setCookies("mantine-color-scheme", nextColorScheme, {
+    setCookie("mantine-color-scheme", nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,
     });
   };
@@ -44,9 +56,19 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
           withGlobalStyles
           withNormalizeCSS
         >
-          <NotificationsProvider>
-            <Component {...pageProps} />
-          </NotificationsProvider>
+          <ModalsProvider>
+            <NotificationsProvider>
+              <UserProvider>
+                {Component.PageLayout ? (
+                  <Component.PageLayout>
+                    <Component {...pageProps} />
+                  </Component.PageLayout>
+                ) : (
+                  <Component {...pageProps} />
+                )}
+              </UserProvider>
+            </NotificationsProvider>
+          </ModalsProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </SessionProvider>

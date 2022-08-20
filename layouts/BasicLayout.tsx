@@ -4,23 +4,19 @@ import Head from "next/head";
 import { ReactNode } from "react";
 
 interface BasicLayoutInterface {
-  title: string;
-  description: string;
-  icon?: string;
   children: ReactNode | ReactNode[];
 }
 
-const BasicLayout = ({
-  children,
-  icon = "/favicon.ico",
-  ...props
-}: BasicLayoutInterface) => {
+const BasicLayout = ({ children }: BasicLayoutInterface) => {
   return (
     <AppShell fixed={false} header={<DefaultHeader />}>
       <Head>
-        <title>{props.title}</title>
-        <meta name="description" content={props.description} />
-        <link rel="icon" href={icon} />
+        <title>CLA | LAEDS</title>
+        <meta
+          name="description"
+          content="Central das Ligas Acadêmicas | LAEDS"
+        />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       {children}
     </AppShell>
