@@ -7,6 +7,7 @@ import {
   Header,
   Menu,
   Text,
+  Title,
   UnstyledButton,
   useMantineColorScheme,
   useMantineTheme,
@@ -62,20 +63,22 @@ export const DefaultHeader = () => {
 
   useEffect(() => {
     if (session) {
-      let linkHref = session.user?.name?.split(" ").join("");
-
-      return setProfileLink(linkHref!);
+      return setProfileLink(session.user.username);
     }
 
     setProfileLink("/uuuueeeeppa");
   }, [session]);
+
+  useEffect(() => {
+    setActive(pathname);
+  }, [pathname]);
 
   return (
     <Header height={HEADER_HEIGHT} mb={30}>
       <Container className={classes.inner} size={ContainerEnum.size}>
         <Link href={"/"}>
           <a>
-            <h1>LAEDS</h1>
+            <Title order={1}>LAEDS</Title>
           </a>
         </Link>
 
@@ -145,14 +148,16 @@ export const DefaultHeader = () => {
                 <Divider />
 
                 <Menu.Item
+                  closeMenuOnClick
                   icon={<User size={14} />}
                   component={NextLink}
-                  href={`/${profileLink}`}
+                  href={`/user/${profileLink}`}
                 >
                   Meu Perfil
                 </Menu.Item>
 
                 <Menu.Item
+                  closeMenuOnClick
                   icon={<Settings size={14} />}
                   component={NextLink}
                   href={"/settings/profile"}
