@@ -4,7 +4,7 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
-import { getCookie, setCookies } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
@@ -34,7 +34,7 @@ export default function App(
       value || (colorScheme === "dark" ? "light" : "dark");
 
     setColorScheme(nextColorScheme);
-    setCookies("mantine-color-scheme", nextColorScheme, {
+    setCookie("mantine-color-scheme", nextColorScheme, {
       maxAge: 60 * 60 * 24 * 30,
     });
   };

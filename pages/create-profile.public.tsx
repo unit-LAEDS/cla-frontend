@@ -29,6 +29,11 @@ const PageContent = () => {
 
   const handleDataSaved = (value: boolean) => {
     if (value) {
+      showNotification({
+        title: "Perfil criado com sucesso 😎",
+        message: "Você será redirecionado!",
+      });
+
       reloadSession();
 
       return setTimeout(() => push("/"), 1000);

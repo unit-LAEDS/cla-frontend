@@ -1,3 +1,4 @@
+import LaedsHeader, { LaedsHeaderInterface } from "@components/LaedsHeader";
 import ProfileContent from "@components/ProfileContent";
 import { Container, createStyles } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
@@ -6,6 +7,10 @@ import { NextPageWithLayout } from "@pages/_app.public";
 import { BasicLayout } from "layouts";
 
 const Profile: NextPageWithLayout = () => {
+  const metadata: LaedsHeaderInterface = {
+    title: `CLA | Settings | Profile `,
+  };
+
   const { classes } = useClasses();
   const matches = useMediaQuery("(min-width: 425px)", true, {
     getInitialValueInEffect: false,
@@ -29,6 +34,8 @@ const Profile: NextPageWithLayout = () => {
 
   return (
     <>
+      <LaedsHeader {...metadata} />
+
       {matches ? (
         <Container size={"md"} className={classes.container}>
           <ProfileContent dataSaved={handleDataSaved} />

@@ -1,3 +1,4 @@
+import LaedsHeader, { LaedsHeaderInterface } from "@components/LaedsHeader";
 import { Player } from "@lottiefiles/react-lottie-player";
 import {
   Avatar,
@@ -94,7 +95,7 @@ const UsernameProfile: NextPageWithLayout = ({
             <Button variant="outline">Voltar para a home</Button>
           </Link>
         ) : (
-          <Link href="/auth/signin">
+          <Link href="/auth/signup">
             <Button variant="outline">Esse username pode ser seu !!!</Button>
           </Link>
         )}
@@ -102,66 +103,83 @@ const UsernameProfile: NextPageWithLayout = ({
     );
   }
 
-  return (
-    <Container size={ContainerEnum.size} className={classes.container}>
-      <section className={classes.basicInfo}>
-        <Paper radius="md" withBorder className={classes.basicInfoPaper} p="lg">
-          <Avatar src={user?.image} size={120} radius={120} mx="auto" />
-          <Text align="center" size="lg" weight={500} mt="md">
-            {loading ? <Skeleton height={8} radius="lg" /> : user?.name}
-          </Text>
-          <Text
-            align="center"
-            color="dimmed"
-            size="sm"
-            style={{
-              wordBreak: "break-word",
-            }}
-          >
-            {user?.bio}
-          </Text>
-        </Paper>
+  const metadata: LaedsHeaderInterface = {
+    title: `CLA | ${user.username}`,
+    description: user.bio,
+    twitter: "@laedsOfficial",
+    url: `https://www.laeds.org/user/${user.username}`,
+    image: user.image,
+    keywords: `LAEDS, Central das Ligas Acadêmicas, CLA, Liga Acadêmica, CLA ${user.username}, CLA ${user.name}`,
+  };
 
-        <Card withBorder>
-          <Divider label={<Text>Redes Sociais</Text>} />
-          {loading && (
-            <>
-              <Skeleton height={8} mt={10} width="50%" radius="lg" />
-              <Skeleton height={8} mt={10} radius="lg" />
-            </>
-          )}
-          {user?.SocialMediaLinks.map(media => (
-            <div className={classes.socialMedia}>
-              <Text size="sm">{media.name}</Text>
-              <a href={`${media.value}`} target={"_blank"}>
-                <Text size="xs" color="dimmed">
-                  {`${media.value}`}
-                </Text>
-              </a>
-            </div>
-          ))}
-        </Card>
-      </section>
-      <section className={classes.userDetails}>
-        <Paper
-          shadow="xl"
-          p="lg"
-          withBorder
-          sx={theme => ({
-            backgroundColor:
-              theme.colorScheme === "dark" ? theme.colors.gray : "",
-          })}
-        >
-          <TypographyStylesProvider>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: user.about || "<p>Nada a declarar 🤷‍♀️</p>",
+  return (
+    <>
+      <LaedsHeader {...metadata} />
+      <Container size={ContainerEnum.size} className={classes.container}>
+        <section className={classes.basicInfo}>
+          <Paper
+            radius="md"
+            withBorder
+            className={classes.basicInfoPaper}
+            p="lg"
+          >
+            <Avatar src={user?.image} size={120} radius={120} mx="auto" />
+            <Text align="center" size="lg" weight={500} mt="md">
+              {loading ? <Skeleton height={8} radius="lg" /> : user?.name}
+            </Text>
+            <Text
+              align="center"
+              color="dimmed"
+              size="sm"
+              style={{
+                wordBreak: "break-word",
               }}
-            />
-          </TypographyStylesProvider>
-        </Paper>
-      </section>
-    </Container>
+            >
+              {user?.bio}
+            </Text>
+          </Paper>
+
+          <Card withBorder>
+            <Divider label={<Text>Redes Sociais</Text>} />
+            {loading && (
+              <>
+                <Skeleton height={8} mt={10} width="50%" radius="lg" />
+                <Skeleton height={8} mt={10} radius="lg" />
+              </>
+            )}
+            {user?.SocialMediaLinks.map(media => (
+              <div className={classes.socialMedia} key={media.id}>
+                <Text size="sm">{media.name}</Text>
+                <a href={`${media.value}`} target={"_blank"}>
+                  <Text size="xs" color="dimmed">
+                    {`${media.value}`}
+                  </Text>
+                </a>
+              </div>
+            ))}
+          </Card>
+        </section>
+        <section className={classes.userDetails}>
+          <Paper
+            shadow="xl"
+            p="lg"
+            withBorder
+            sx={theme => ({
+              backgroundColor:
+                theme.colorScheme === "dark" ? theme.colors.gray : "",
+            })}
+          >
+            <TypographyStylesProvider>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: user.about || "<p>Nada a declarar 🤷‍♀️</p>",
+                }}
+              />
+            </TypographyStylesProvider>
+          </Paper>
+        </section>
+      </Container>
+    </>
   );
 };
 

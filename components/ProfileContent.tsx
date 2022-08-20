@@ -16,7 +16,7 @@ import RichTextEditor from "components/RichText";
 import { UserContext } from "context";
 import { useSession } from "next-auth/react";
 import React, { Suspense, useContext, useEffect, useState } from "react";
-import { laedsPostUpdateUserProfile } from "services";
+import { laedsPostUpdateUserProfile, SocialMediaLink } from "services";
 import { socialLinks, SocialMediaFormList } from "./SocialMediaFormList";
 
 interface ProfileContentInterface {
@@ -34,6 +34,9 @@ const ProfileContent = ({ dataSaved }: ProfileContentInterface) => {
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
   const [imageFile, setImageFile] = useState<string>();
   const [rteValue, setRteValue] = useState<string>("");
+  const [sessionSocialMediaLinks, setSessionSocialMediaLinks] = useState<
+    SocialMediaLink[]
+  >([]);
   const [socialMediaLinks, setSocialMediaLinks] = useState<socialLinks>([]);
 
   const form = useForm({
@@ -91,15 +94,21 @@ const ProfileContent = ({ dataSaved }: ProfileContentInterface) => {
 
   useEffect(() => {
     if (session) {
-      let { name, bio, about, image } = session.user;
+      let { name, bio, about, image, SocialMediaLinks } = session.user;
 
       form.setFieldValue("name", name!);
       form.setFieldValue("bio", bio);
 
       setRteValue(about || "");
       setProfileImageUrl(image!);
+      setSessionSocialMediaLinks(SocialMediaLinks);
     }
-  }, [session]);
+  }, [
+    session?.user.name,
+    session?.user.bio,
+    session?.user.about,
+    session?.user.image,
+  ]);
 
   return (
     <form className={classes.form} onSubmit={handleSubmitForm}>
@@ -162,7 +171,7 @@ const ProfileContent = ({ dataSaved }: ProfileContentInterface) => {
       <Paper className={classes.socialMediaLinks} withBorder p={"lg"}>
         <SocialMediaFormList
           socialMediaLinks={handleSocialMediaLinks}
-          links={session?.user.SocialMediaLinks!}
+          links={sessionSocialMediaLinks}
         />
       </Paper>
       <Suspense fallback={<p>Loading...</p>}>

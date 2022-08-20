@@ -2,7 +2,7 @@ import { Paper, TextInput, Tooltip } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconAlertCircle, IconAt } from "@tabler/icons";
 import { ReactNode, useEffect, useState } from "react";
-import { laedsFindUsername } from "services";
+import { laedsFindUsernameOrEmail } from "services";
 
 interface SelectUsernameInterface {
   isError: (value: boolean) => void;
@@ -21,7 +21,7 @@ const DefineUsername = ({
 
   const handleLaedsFindUsername = async () => {
     try {
-      const response = await laedsFindUsername(username);
+      const response = await laedsFindUsernameOrEmail(username);
 
       setError("");
       isError(false);

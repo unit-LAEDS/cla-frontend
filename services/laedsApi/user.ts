@@ -42,8 +42,10 @@ export const laedsGetUser = async (username: string) => {
   return laedsResponse.data as LaedsUser;
 };
 
-export const laedsFindUsername = async (username: string) => {
-  const response = await laedsApiInstance.get(`/user/username/${username}`);
+export const laedsFindUsernameOrEmail = async (username: string) => {
+  const response = await laedsApiInstance.get(
+    `/user/username-email/${username}`
+  );
 
   return checkResponse(response);
 };

@@ -1,20 +1,10 @@
 import DefineUsername from "@components/DefineUsername";
-import {
-  Button,
-  Container,
-  Paper,
-  Text,
-  TextInput,
-  Title,
-  Tooltip,
-} from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { Button, Container, Text, Title } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconAlertCircle, IconAt } from "@tabler/icons";
 import { UserContext } from "context";
 import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
-import { laedsFindUsername, laedsSetUsername } from "services";
+import React, { useContext, useState } from "react";
+import { laedsSetUsername } from "services";
 
 const SelectUsername = () => {
   const [username, setUsername] = useState<string>("");

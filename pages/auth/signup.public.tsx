@@ -1,4 +1,5 @@
 import DefineUsername from "@components/DefineUsername";
+import LaedsHeader, { LaedsHeaderInterface } from "@components/LaedsHeader";
 import {
   Anchor,
   Box,
@@ -15,7 +16,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useInputState } from "@mantine/hooks";
+import { useDebouncedValue, useInputState } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
@@ -23,8 +24,9 @@ import { getToken } from "next-auth/jwt";
 import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { laedsSignup } from "services";
+import { laedsLogo } from "public";
+import { useEffect, useState } from "react";
+import { laedsFindUsernameOrEmail, laedsSignup } from "services";
 
 const secret = process.env.SECRET;
 
@@ -73,10 +75,19 @@ function getStrength(password: string) {
 export default function Signup({
   csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const metadata: LaedsHeaderInterface = {
+    title: `CLA | Signup`,
+    description: "Venha fazer parte da LAEDS | CLA. Cadastre-se agora mesmo",
+    twitter: "@laedsOfficial",
+    url: `https://www.laeds.org/auth/signup`,
+    keywords: `LAEDS, Central das Ligas Acadêmicas, CLA, Liga Acadêmica, CLA Cadastro, CLA Singup`,
+  };
+
   const [shake, setShake] = useState(false);
   const [value, setValue] = useInputState("");
 
   const [error, setError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const strength = getStrength(value);
   const form = useForm({
     initialValues: {
@@ -84,11 +95,12 @@ export default function Signup({
       email: "",
     },
   });
+  const [emailDebounce] = useDebouncedValue(form.values.email, 300);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (strength < 100 || error) {
+    if (strength < 100 || error || Object.keys(form.errors).length >= 1) {
       setShake(true);
 
       setTimeout(() => setShake(false), 300);
@@ -180,101 +192,125 @@ export default function Signup({
       />
     ));
 
+  const handleFindEmail = async () => {
+    try {
+      await laedsFindUsernameOrEmail(emailDebounce);
+      setEmailError(false);
+    } catch (error) {
+      form.setFieldError("email", "Email já utilizado");
+      setEmailError(true);
+    }
+  };
+
+  useEffect(() => {
+    handleFindEmail();
+  }, [emailDebounce]);
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "4rem",
-      }}
-    >
-      <Container
+    <>
+      <LaedsHeader {...metadata} />
+
+      <div
         style={{
-          width: "40rem",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "4rem",
         }}
       >
-        <form
-          onSubmit={handleSubmit}
+        <Container
           style={{
-            display: "flex",
-            flexDirection: "column",
-            rowGap: "1rem",
+            width: "40rem",
           }}
         >
-          <Box
-            sx={theme => ({
-              animation:
-                shake && error
-                  ? `${shakeHorizontal} .8s cubic-bezier(.455,.03,.515,.955) both`
-                  : "",
-            })}
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              rowGap: "1rem",
+            }}
           >
-            <DefineUsername
-              isError={handleUsernameError}
-              getUsername={handleGetUsername}
-            />
-          </Box>
-
-          <Paper withBorder shadow="md" p={30} radius="md">
-            <Stack>
-              <TextInput
-                label="Email"
-                type={"email"}
-                placeholder="seumelhor@email.com"
-                required
-                {...form.getInputProps("email")}
-              />
-              <div>
-                <PasswordInput
-                  value={value}
-                  onChange={setValue}
-                  label="Senha"
-                  required
-                />
-                <Group spacing={5} grow mt="xs" mb="md">
-                  {bars}
-                </Group>
-                <PasswordRequirement
-                  label="Tem pelo menos 6 caracteres"
-                  meets={value.length > 5}
-                />
-                {checks}
-              </div>
-            </Stack>
-
-            <Button
-              fullWidth
-              mt="xl"
-              type="submit"
-              // disabled={strength === 100 ? false : true}
-              onClick={() => {}}
+            <Box
+              sx={theme => ({
+                animation:
+                  shake && error
+                    ? `${shakeHorizontal} .8s cubic-bezier(.455,.03,.515,.955) both`
+                    : "",
+              })}
             >
-              Criar Conta
-            </Button>
+              <DefineUsername
+                isError={handleUsernameError}
+                getUsername={handleGetUsername}
+              />
+            </Box>
 
-            <Text color="dimmed" size="xs" align="center" mt={10}>
-              Ao criar um conta você concorda com os{" "}
-              <Link href="/cla/site-policy">
-                <Anchor<"a"> size="xs">termos de uso</Anchor>
-              </Link>{" "}
-              e{" "}
-              <Link href="/cla/site-policy">
-                <Anchor<"a"> size="xs">políticas de privacidade</Anchor>
-              </Link>{" "}
-              da plataforma
-            </Text>
-          </Paper>
-        </form>
+            <Paper withBorder shadow="md" p={30} radius="md">
+              <Stack>
+                <TextInput
+                  label="Email"
+                  type={"email"}
+                  placeholder="seumelhor@email.com"
+                  required
+                  {...form.getInputProps("email")}
+                  sx={theme => ({
+                    animation:
+                      shake && emailError
+                        ? `${shakeHorizontal} .8s cubic-bezier(.455,.03,.515,.955) both`
+                        : "",
+                  })}
+                />
+                <div>
+                  <PasswordInput
+                    value={value}
+                    onChange={setValue}
+                    label="Senha"
+                    required
+                  />
+                  <Group spacing={5} grow mt="xs" mb="md">
+                    {bars}
+                  </Group>
+                  <PasswordRequirement
+                    label="Tem pelo menos 6 caracteres"
+                    meets={value.length > 5}
+                  />
+                  {checks}
+                </div>
+              </Stack>
 
-        <Text color="dimmed" size="sm" align="center" mt={5}>
-          Já tem uma conta?{" "}
-          <Link href="/auth/signin">
-            <Anchor<"a"> size="sm">Voltar para o login</Anchor>
-          </Link>
-        </Text>
-      </Container>
-    </div>
+              <Button
+                fullWidth
+                mt="xl"
+                type="submit"
+                // disabled={strength === 100 ? false : true}
+                onClick={() => {}}
+              >
+                Criar Conta
+              </Button>
+
+              <Text color="dimmed" size="xs" align="center" mt={10}>
+                Ao criar um conta você concorda com os{" "}
+                <Link href="/cla/site-policy">
+                  <Anchor<"a"> size="xs">termos de uso</Anchor>
+                </Link>{" "}
+                e{" "}
+                <Link href="/cla/site-policy">
+                  <Anchor<"a"> size="xs">políticas de privacidade</Anchor>
+                </Link>{" "}
+                da plataforma
+              </Text>
+            </Paper>
+          </form>
+
+          <Text color="dimmed" size="sm" align="center" mt={5}>
+            Já tem uma conta?{" "}
+            <Link href="/auth/signin">
+              <Anchor<"a"> size="sm">Voltar para o login</Anchor>
+            </Link>
+          </Text>
+        </Container>
+      </div>
+    </>
   );
 }
 

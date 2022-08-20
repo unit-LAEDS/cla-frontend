@@ -1,3 +1,4 @@
+import LaedsHeader, { LaedsHeaderInterface } from "@components/LaedsHeader";
 import {
   Anchor,
   Button,
@@ -17,6 +18,7 @@ import { getToken } from "next-auth/jwt";
 import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
 import Router from "next/router";
+import { laedsLogo } from "public";
 import { BrandGithub } from "tabler-icons-react";
 
 const secret = process.env.SECRET;
@@ -48,6 +50,14 @@ export default function Signin({
   csrfToken,
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const metadata: LaedsHeaderInterface = {
+    title: `CLA | Signin`,
+    description: "Página de Login",
+    twitter: "@laedsOfficial",
+    url: `https://www.laeds.org/auth/signin`,
+    keywords: `LAEDS, Central das Ligas Acadêmicas, CLA, Liga Acadêmica, CLA Login, CLA Singin`,
+  };
+
   const form = useForm({
     initialValues: {
       username: "",
@@ -56,96 +66,99 @@ export default function Signin({
   });
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
-      <Container
+    <>
+      <LaedsHeader {...metadata} />
+      <div
         style={{
-          width: "40rem",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        <Paper withBorder shadow="md" p={30} radius="md">
-          <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
+        <Container
+          style={{
+            width: "40rem",
+          }}
+        >
+          <Paper withBorder shadow="md" p={30} radius="md">
+            <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
-          <Group grow mb="md">
+            <Group grow mb="md">
+              <Button
+                leftIcon={<BrandGithub />}
+                radius="xl"
+                sx={theme => ({
+                  backgroundColor: "#2a292e",
+                  ":hover": {
+                    backgroundColor: "#8357e6",
+                  },
+                })}
+                onClick={() => signIn("github")}
+              >
+                GitHub
+              </Button>
+            </Group>
+
+            <Divider
+              label="Ou continue com o email"
+              labelPosition="center"
+              my="lg"
+            />
+
+            <TextInput
+              {...form.getInputProps("username")}
+              label="Username ou Email"
+              required
+            />
+            <PasswordInput
+              {...form.getInputProps("password")}
+              label="Senha"
+              required
+              mt="md"
+            />
+            <Group position="apart" mt="md">
+              <Checkbox label="Lembrar de mim" />
+              <Anchor<"a">
+                onClick={event => event.preventDefault()}
+                href="#"
+                size="sm"
+              >
+                Esqueceu a senha?
+              </Anchor>
+            </Group>
             <Button
-              leftIcon={<BrandGithub />}
-              radius="xl"
-              sx={theme => ({
-                backgroundColor: "#2a292e",
-                ":hover": {
-                  backgroundColor: "#8357e6",
-                },
-              })}
-              onClick={() => signIn("github")}
-            >
-              GitHub
-            </Button>
-          </Group>
-
-          <Divider
-            label="Ou continue com o email"
-            labelPosition="center"
-            my="lg"
-          />
-
-          <TextInput
-            {...form.getInputProps("username")}
-            label="Username ou Email"
-            required
-          />
-          <PasswordInput
-            {...form.getInputProps("password")}
-            label="Senha"
-            required
-            mt="md"
-          />
-          <Group position="apart" mt="md">
-            <Checkbox label="Lembrar de mim" />
-            <Anchor<"a">
-              onClick={event => event.preventDefault()}
-              href="#"
-              size="sm"
-            >
-              Esqueceu a senha?
-            </Anchor>
-          </Group>
-          <Button
-            fullWidth
-            mt="xl"
-            onClick={async () => {
-              const response = await signIn("credentials", {
-                username: form.values.username,
-                password: form.values.password,
-                redirect: false,
-              });
-
-              if (response?.error) {
-                return showNotification({
-                  title: "Ops...",
-                  message: "Usuário ou senha inválidos!",
-                  color: "red",
+              fullWidth
+              mt="xl"
+              onClick={async () => {
+                const response = await signIn("credentials", {
+                  username: form.values.username,
+                  password: form.values.password,
+                  redirect: false,
                 });
-              }
 
-              Router.push("/");
-            }}
-          >
-            Entrar
-          </Button>
-        </Paper>
+                if (response?.error) {
+                  return showNotification({
+                    title: "Ops...",
+                    message: "Usuário ou senha inválidos!",
+                    color: "red",
+                  });
+                }
 
-        <Text color="dimmed" size="sm" align="center" mt={5}>
-          Ainda não tem uma conta?{" "}
-          <Link href="/auth/signup">
-            <Anchor<"a"> size="sm">Criar Conta</Anchor>
-          </Link>
-        </Text>
-      </Container>
-    </div>
+                Router.push("/");
+              }}
+            >
+              Entrar
+            </Button>
+          </Paper>
+
+          <Text color="dimmed" size="sm" align="center" mt={5}>
+            Ainda não tem uma conta?{" "}
+            <Link href="/auth/signup">
+              <Anchor<"a"> size="sm">Criar Conta</Anchor>
+            </Link>
+          </Text>
+        </Container>
+      </div>
+    </>
   );
 }
