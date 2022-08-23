@@ -83,7 +83,10 @@ const Home: NextPageWithLayout = ({
                     color="dimmed"
                     size="sm"
                     style={{
-                      wordBreak: "break-word",
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 2,
                     }}
                   >
                     {user?.bio}
