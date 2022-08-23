@@ -139,7 +139,16 @@ const UsernameProfile: NextPageWithLayout = ({
             </Text>
           </Paper>
 
-          <Card withBorder>
+          <Card
+            withBorder
+            sx={theme => ({
+              width: "30rem",
+
+              [`@media (max-width: ${theme.breakpoints.xs}px)`]: {
+                width: "100%",
+              },
+            })}
+          >
             <Divider label={<Text>Redes Sociais</Text>} />
             {loading && (
               <>
@@ -159,6 +168,7 @@ const UsernameProfile: NextPageWithLayout = ({
             ))}
           </Card>
         </section>
+
         <section className={classes.userDetails}>
           <Paper
             shadow="xl"
